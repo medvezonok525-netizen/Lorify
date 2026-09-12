@@ -41,7 +41,7 @@ function showScreen(screenId) {
     }
 }
 
-// 🔍 ИСПРАВЛЕННАЯ ЖИВАЯ ДЕТЕКЦИЯ: БОЛЬШЕ НИЧЕГО НЕ БЛОКИРУЕТСЯ И ВСЁ НАЖИМАЕТСЯ!
+// ЖИВАЯ ПРОВЕРКА ЮЗЕРНЕЙМА НА ЗАНЯТОСТЬ ПРИ НАБОРЕ (ИСПРАВЛЕННАЯ, БЕЗ ЛАГОВ И ЗАЛИПАНИЙ)
 function checkUsernameLive() {
     const usernameInput = document.getElementById("reg-username");
     const errorMsg = document.getElementById("username-error-msg");
@@ -49,7 +49,7 @@ function checkUsernameLive() {
 
     if (!usernameInput || !errorMsg || !submitBtn) return;
 
-    let inputUsername = usernameInput.value.trim().toLowerCase();
+    let inputUsername = usernameInput.value.trim();
 
     if (inputUsername.startsWith("@")) inputUsername = inputUsername.substring(1);
     if (inputUsername.endsWith("@")) inputUsername = inputUsername.slice(0, -1);
@@ -61,11 +61,11 @@ function checkUsernameLive() {
         return;
     }
 
-    // Сканируем базу данных на совпадения по регистру символов
+    // Попиксельный перебор ключей базы данных
     let isTaken = false;
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.toLowerCase() === "lorify_user_" + inputUsername) {
+        if (key && key.toLowerCase() === ("lorify_user_" + inputUsername).toLowerCase()) {
             isTaken = true;
             break;
         }
@@ -73,7 +73,7 @@ function checkUsernameLive() {
 
     if (isTaken) {
         errorMsg.style.display = "block";
-        submitBtn.disabled = true; // Замораживаем кнопку только если ник совпал
+        submitBtn.disabled = true; // Замораживаем кнопку только при совпадении
         submitBtn.style.opacity = "0.4";
     } else {
         errorMsg.style.display = "none";
@@ -82,17 +82,18 @@ function checkUsernameLive() {
     }
 }
 
-// ПЕРЕКЛЮЧЕНИЕ МЕЖДУ СТРАНИЦАМИ ВНУТРИ САЙДБАРА
+// ПЕРЕКЛЮЧЕНИЕ КАРТОЧЕК ВНУТРИ САЙДБАРА ПЛЕЕРА
 function changeContentArea(blockName) {
     document.querySelectorAll('.content-block').forEach(b => b.style.display = 'none');
     const targetBlock = document.getElementById('content-' + blockName);
     if (targetBlock) targetBlock.style.display = 'block';
 }
 
+// ВХОД В ПРИЛОЖЕНИЕ С ЗАПУСКОМ ЖИВОЙ СИНХРОНИЗАЦИИ
 function enterMainApp() {
     document.getElementById('auth-box').style.display = 'none';
     document.getElementById('main-app-screen').style.display = 'flex';
-    changeContentArea('welcome'); // Сбрасываем контент на стартовый
+    changeContentArea('welcome');
 
     const adminBtn = document.getElementById('admin-sidebar-btn');
     if (adminBtn) {
@@ -111,6 +112,7 @@ function enterMainApp() {
 }
 
 function triggerBanScreen() {
+    localStorage.removeItem("lorify_active_session"); // Стираем сессию при бане
     activeSessionUser = "";
     document.getElementById('main-app-screen').style.display = 'none';
     document.getElementById('auth-box').style.display = 'none';
@@ -152,6 +154,7 @@ function processRegistration() {
     };
 
     localStorage.setItem("lorify_user_" + username, JSON.stringify(userData));
+    localStorage.setItem("lorify_active_session", username); // СОХРАНЯЕМ ВЕЧНУЮ СЕССИЮ
     activeSessionUser = username;
 
     document.getElementById("welcome-user-title").innerText = `Добро пожаловать, ${username}`;
@@ -180,14 +183,17 @@ function processLogin() {
             document.getElementById("login-username").value = "";
             document.getElementById("login-pass").value = "";
             
+            localStorage.setItem("lorify_active_session", username); // СОХРАНЯЕМ ВЕЧНУЮ СЕССИЮ
             activeSessionUser = username;
             enterMainApp();
         } else { alert("Неверный пароль!"); }
     } else { alert("Пользователь не найден!"); }
 }
 
+// ВЫХОД
 function logoutBoba() { 
     clearInterval(liveSyncCheck);
+    localStorage.removeItem("lorify_active_session"); // СТИРАЕМ СЕССИЮ ПРИ ЛОГАУТЕ
     activeSessionUser = "";
     document.getElementById('main-app-screen').style.display = 'none';
     document.getElementById('auth-box').style.display = 'block';
@@ -230,6 +236,20 @@ function deleteUserCard(targetUsername) {
     }
 }
 
+// 🧠 ДВИЖОК АВТОМАТИЧЕСКОГО ОПРЕДЕЛЕНИЯ ТЕКУЩЕЙ СЕССИИ ПРИ ЗАПУСКЕ САЙТА
+function checkSavedSessionLive() {
+    const savedSession = localStorage.getItem("lorify_active_session");
+    if (savedSession) {
+        // Проверяем, существует ли этот юзер до сих пор в базе данных
+        if (localStorage.getItem("lorify_user_" + savedSession)) {
+            activeSessionUser = savedSession;
+            enterMainApp(); // Мгновенно пробиваем старт плеера Lorify
+        } else {
+            localStorage.removeItem("lorify_active_session");
+        }
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     initDateSelectors();
-});
+    checkSavedSessionLive(); // Запускаем проверку сохраненного аккаунта
