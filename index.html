@@ -13,76 +13,81 @@
 
     <div class="app-container">
 
-        <!-- 1. СТАРТОВЫЙ ЭКРАН -->
-        <div id="welcome-screen" class="screen">
-            <div class="logo-title">Lorify</div>
-            <div class="welcome-buttons">
-                <button class="btn btn-primary" onclick="showScreen('register-screen')">Регистрация</button>
-                <button class="btn btn-secondary" onclick="showScreen('login-screen')">Войти</button>
+        <!-- ОБОРУДОВАННЫЙ КОНТЕЙНЕР ДЛЯ ФОРМ АВТОРИЗАЦИИ -->
+        <div id="auth-box" class="auth-wrapper">
+            
+            <!-- 1. СТАРТОВЫЙ ЭКРАН -->
+            <div id="welcome-screen" class="inner-screen">
+                <div class="logo-title">Lorify</div>
+                <div class="welcome-buttons">
+                    <button class="btn btn-primary" onclick="showScreen('register-screen')">Регистрация</button>
+                    <button class="btn btn-secondary" onclick="showScreen('login-screen')">Войти</button>
+                </div>
             </div>
-        </div>
 
-        <!-- 2. ЭКРАН РЕГИСТРАЦИИ -->
-        <div id="register-screen" class="screen">
-            <div class="form-card">
-                <h2>Создать аккаунт</h2>
-                <div class="input-group">
-                    <label>Имя</label>
-                    <input type="text" id="reg-name" placeholder="Иван">
-                </div>
-                <div class="input-group">
-                    <label>Юзернейм</label>
-                    <input type="text" id="reg-username" placeholder="username">
-                </div>
-                <div class="input-group">
-                    <label>Дата рождения</label>
-                    <div class="date-row">
-                        <select id="reg-day"><option value="">День</option></select>
-                        <select id="reg-month"><option value="">Месяц</option></select>
-                        <select id="reg-year"><option value="">Год</option></select>
+            <!-- 2. ЭКРАН РЕГИСТРАЦИИ -->
+            <div id="register-screen" class="inner-screen" style="display: none;">
+                <div class="form-card">
+                    <h2>Создать аккаунт</h2>
+                    <div class="input-group">
+                        <label>Имя</label>
+                        <input type="text" id="reg-name" placeholder="Иван">
                     </div>
+                    <div class="input-group">
+                        <label>Юзернейм</label>
+                        <input type="text" id="reg-username" placeholder="username">
+                    </div>
+                    <div class="input-group">
+                        <label>Дата рождения</label>
+                        <div class="date-row">
+                            <select id="reg-day"><option value="">День</option></select>
+                            <select id="reg-month"><option value="">Месяц</option></select>
+                            <select id="reg-year"><option value="">Год</option></select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Пароль</label>
+                        <input type="password" id="reg-pass" placeholder="••••••••">
+                    </div>
+                    <div class="input-group">
+                        <label>Повтор пароля</label>
+                        <input type="password" id="reg-confirm" placeholder="••••••••">
+                    </div>
+                    <button class="btn btn-primary" id="reg-submit-btn" onclick="processRegistration()">Зарегистрироваться</button>
                 </div>
-                <div class="input-group">
-                    <label>Пароль</label>
-                    <input type="password" id="reg-pass" placeholder="••••••••">
-                </div>
-                <div class="input-group">
-                    <label>Повтор пароля</label>
-                    <input type="password" id="reg-confirm" placeholder="••••••••">
-                </div>
-                <button class="btn btn-primary" id="reg-submit-btn" onclick="processRegistration()">Зарегистрироваться</button>
+                <div class="back-link" onclick="showScreen('welcome-screen')">Назад</div>
             </div>
-            <div class="back-link" onclick="showScreen('welcome-screen')">Назад</div>
-        </div>
 
-        <!-- 3. ЭКРАН УСПЕХА С ГАЛОЧКОЙ -->
-        <div id="success-screen" class="screen">
-            <div class="success-icon-box">
-                <span class="checkmark">✓</span>
+            <!-- 3. ЭКРАН УСПЕХА С ГАЛОЧКОЙ -->
+            <div id="success-screen" class="inner-screen" style="display: none;">
+                <div class="success-icon-box">
+                    <span class="checkmark">✓</span>
+                </div>
+                <div class="welcome-user-text" id="welcome-user-title">Добро пожаловать, user</div>
+                <button class="btn btn-primary" style="max-width: 200px;" onclick="enterMainApp()">Начать</button>
             </div>
-            <div class="welcome-user-text" id="welcome-user-title">Добро пожаловать, user</div>
-            <button class="btn btn-primary" style="max-width: 200px;" onclick="showScreen('main-app-screen')">Начать</button>
-        </div>
 
-        <!-- 4. ЭКРАН ЛОГИНА -->
-        <div id="login-screen" class="screen">
-            <div class="form-card">
-                <h2>Войти в Lorify</h2>
-                <div class="input-group">
-                    <label>Юзернейм</label>
-                    <input type="text" id="login-username" placeholder="Drop4ik">
+            <!-- 4. ЭКРАН ЛОГИНА -->
+            <div id="login-screen" class="inner-screen" style="display: none;">
+                <div class="form-card">
+                    <h2>Войти в Lorify</h2>
+                    <div class="input-group">
+                        <label>Юзернейм</label>
+                        <input type="text" id="login-username" placeholder="Drop4ik">
+                    </div>
+                    <div class="input-group">
+                        <label>Пароль</label>
+                        <input type="password" id="login-pass" placeholder="123">
+                    </div>
+                    <button class="btn btn-primary" onclick="processLogin()">Войти</button>
                 </div>
-                <div class="input-group">
-                    <label>Пароль</label>
-                    <input type="password" id="login-pass" placeholder="123">
-                </div>
-                <button class="btn btn-primary" onclick="processLogin()">Войти</button>
+                <div class="back-link" onclick="showScreen('welcome-screen')">Назад</div>
             </div>
-            <div class="back-link" onclick="showScreen('welcome-screen')">Назад</div>
+
         </div>
 
         <!-- 5. ГЛАВНЫЙ ИНТЕРФЕЙС ПЛАТФОРМЫ -->
-        <div id="main-app-screen" class="screen-full">
+        <div id="main-app-screen" class="screen-full" style="display: none;">
             
             <!-- SIDEBAR -->
             <div class="sidebar">
@@ -99,7 +104,7 @@
                         <span class="sidebar-icon">👤</span> Профиль
                     </button>
                     
-                    <!-- Скрытая кнопка админки для Drop4ik (изначально спрятана) -->
+                    <!-- Скрытая кнопка админки для Drop4ik -->
                     <button class="sidebar-btn admin-btn-style" id="admin-sidebar-btn" onclick="openAdminModal()" style="display: none; pointer-events: auto;">
                         <span class="sidebar-icon">⚙️</span> Админ панель
                     </button>
@@ -126,7 +131,6 @@
                     
                     <button class="btn btn-primary" style="margin-bottom: 25px;" onclick="loadRegisteredUsers()">Кто зарегистрирован в приложении</button>
                     
-                    <!-- Зона вывода списка всех пользователей -->
                     <div id="users-log-list">
                         <div style="color: var(--text-muted); text-align: center; font-size: 14px;">Лог-таблица пуста. Нажми кнопку выше для сканирования базы данных.</div>
                     </div>
