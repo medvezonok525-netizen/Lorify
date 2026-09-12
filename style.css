@@ -1,10 +1,10 @@
 :root {
     --bg-dark: #090a0f;
-    --bg-card: #12131a;
+    --bg-card: rgba(18, 19, 26, 0.65);
     --accent-green: #1db954;
     --text-main: #f5f5f7;
     --text-muted: #7e7e86;
-    --border-color: #222533;
+    --border-color: rgba(255, 255, 255, 0.08);
 }
 
 html, body {
@@ -15,10 +15,23 @@ html, body {
     -webkit-font-smoothing: antialiased;
 }
 
+.animated-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+    background: linear-gradient(125deg, #090a0f, #11131e, #1a0f2e, #0a1914);
+    background-size: 400% 400%;
+    animation: smoothGradient 18s infinite alternate ease-in-out;
+}
+
+@keyframes smoothGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 .app-container {
     width: 100%; height: 100%;
     display: flex; justify-content: center; align-items: center;
-    position: relative;
+    position: relative; z-index: 1;
 }
 
 .screen {
@@ -57,18 +70,16 @@ html, body {
 .form-card {
     background-color: var(--bg-card); border: 1px solid var(--border-color);
     padding: 30px; border-radius: 24px; width: 100%; box-sizing: border-box;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4); backdrop-filter: blur(20px);
 }
 
 .form-card h2 { margin: 0 0 25px 0; font-size: 24px; font-weight: 800; text-align: center; }
 
-.input-group {
-    display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; width: 100%;
-}
+.input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; width: 100%; }
 .input-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
 .input-group input, .input-group select {
-    padding: 14px 16px; font-size: 15px; background-color: #1a1b24;
+    padding: 14px 16px; font-size: 15px; background-color: rgba(15, 16, 22, 0.6);
     border: 1px solid var(--border-color); border-radius: 12px; color: #ffffff;
     outline: none; transition: border-color 0.2s; width: 100%; box-sizing: border-box;
 }
@@ -78,7 +89,7 @@ html, body {
 
 .back-link {
     margin-top: 20px; color: var(--text-muted); font-size: 14px; font-weight: 600;
-    cursor: pointer; text-decoration: none; transition: color 0.2s;
+    cursor: pointer; text-decoration: none; transition: color 0.2s; z-index: 10;
 }
 .back-link:hover { color: #ffffff; }
 
@@ -94,13 +105,94 @@ html, body {
     opacity: 0; animation: screenFadeIn 0.5s ease 0.6s forwards;
 }
 
-.soon-text {
-    font-size: 40px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase;
-    color: #ffffff; animation: soonPulse 2s infinite alternate ease-in-out;
+.screen-full {
+    display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+    animation: screenFadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
+
+.sidebar {
+    width: 280px; height: 100%; background-color: rgba(10, 11, 16, 0.6);
+    border-right: 1px solid var(--border-color); box-sizing: border-box; padding: 40px 24px;
+    display: flex; flex-direction: column; justify-content: space-between; backdrop-filter: blur(30px);
+}
+
+.sidebar-logo { font-size: 28px; font-weight: 900; color: #ffffff; margin-bottom: 45px; padding-left: 8px; }
+.sidebar-menu { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
+.sidebar-btn {
+    width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600;
+    color: #b3b3b3; background: transparent; border: none; border-radius: 12px;
+    text-align: left; display: flex; align-items: center; gap: 12px;
+    pointer-events: none;
+}
+
+/* Выделенный стиль для рабочей кнопки Админки */
+.sidebar-btn.admin-btn-style {
+    color: #007aff !important;
+    background: rgba(0, 122, 255, 0.08) !important;
+    border: 1px solid rgba(0, 122, 255, 0.15) !important;
+    cursor: pointer !important;
+}
+.sidebar-btn.admin-btn-style:active { transform: scale(0.97); background: rgba(0, 122, 255, 0.15) !important; }
+
+.sidebar-icon { font-size: 18px; }
+
+.logout-btn {
+    width: 100%; padding: 14px; font-size: 14px; font-weight: 700;
+    color: #ff3b30; background: rgba(255, 59, 48, 0.1);
+    border: 1px solid rgba(255, 59, 48, 0.2); border-radius: 12px;
+    cursor: pointer; transition: all 0.2s; pointer-events: auto;
+}
+.logout-btn:active { transform: scale(0.97); background: rgba(255, 59, 48, 0.15); }
+
+.main-content { flex: 1; height: 100%; display: flex; justify-content: center; align-items: center; box-sizing: border-box; padding: 40px; margin-left: 280px; }
+.content-placeholder { text-align: center; max-width: 480px; }
+.content-placeholder h1 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+.content-placeholder p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+
+/* 🔒 СТИЛИ МОДАЛЬНОГО ОКНА АДМИН-ПАНЕЛИ */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); z-index: 9999;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(10px); animation: fadeInDelayed 0.2s ease forwards;
+}
+
+.modal-card {
+    background-color: #12131a; border: 1px solid var(--border-color);
+    width: 90%; max-width: 500px; max-height: 80vh; border-radius: 24px;
+    box-sizing: border-box; padding: 30px; display: flex; flex-direction: column;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6); pointer-events: auto;
+}
+
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 25px; border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
+.modal-header h3 { margin: 0; font-size: 18px; font-weight: 800; color: #ffffff; }
+
+.close-modal-btn {
+    font-size: 28px; color: var(--text-muted); cursor: pointer; line-height: 1;
+}
+.close-modal-btn:hover { color: #ffffff; }
+
+/* Окно вывода логов пользователей со скроллом */
+#users-log-list {
+    flex: 1; overflow-y: auto; background-color: #090a0f;
+    border: 1px solid var(--border-color); border-radius: 14px;
+    padding: 16px; display: flex; flex-direction: column; gap: 10px;
+    max-height: 40vh; box-sizing: border-box;
+}
+
+.user-log-item {
+    font-size: 14px; color: #e5e5ea; line-height: 1.4;
+    padding: 10px 14px; background-color: rgba(255,255,255,0.02);
+    border-radius: 8px; border-left: 3px solid var(--accent-green);
+}
+.user-log-item b { color: var(--accent-green); }
 
 @keyframes logoAnim { to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeInDelayed { to { opacity: 1; } }
-@keyframes screenFadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+@keyframes screenFadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
 @keyframes scaleUpIcon { to { opacity: 1; transform: scale(1); } }
-@keyframes soonPulse { from { opacity: 0.4; filter: blur(1px); } to { opacity: 1; filter: blur(0px); } }
