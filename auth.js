@@ -45,6 +45,7 @@ function showScreen(screenId) {
     }
 }
 
+// ЖИВАЯ ПРОВЕРКА ЮЗЕРНЕЙМА
 function checkUsernameLive() {
     const usernameInput = document.getElementById("reg-username");
     const errorMsg = document.getElementById("username-error-msg");
@@ -110,7 +111,6 @@ function enterMainApp() {
         }, 500);
     }
     
-    // Инициализируем аудио при входе, чтобы подтянуть длительность трека
     setTimeout(initAudioEventListeners, 300);
 }
 
@@ -128,7 +128,7 @@ function resetAfterBan() {
     showScreen('welcome-screen');
 }
 
-// REGISTRATION
+// РЕГИСТРАЦИЯ
 function processRegistration() {
     const name = document.getElementById("reg-name").value.trim();
     let username = document.getElementById("reg-username").value.trim();
@@ -169,7 +169,7 @@ function processRegistration() {
     document.getElementById("reg-confirm").value = "";
 }
 
-// LOGIN
+// ВХОД
 function processLogin() {
     let username = document.getElementById("login-username").value.trim();
     const pass = document.getElementById("login-pass").value;
@@ -193,6 +193,7 @@ function processLogin() {
     } else { alert("Пользователь не найден!"); }
 }
 
+// ВЫХОД
 function logoutBoba() { 
     clearInterval(liveSyncCheck);
     const audioTrack = document.getElementById("audio-player");
@@ -240,23 +241,21 @@ function deleteUserCard(targetUsername) {
     }
 }
 
+// ИСПРАВЛЕННАЯ СИСТЕМА ПРОВЕРКИ АВТО-ВХОДА (ПРАВИЛЬНЫЙ ОБХОД NULL ОШИБОК)
 function checkSavedSessionLive() {
     const savedSession = localStorage.getItem("lorify_active_session");
-    if (savedSession) {
+    if (savedSession && savedSession !== "null" && savedSession !== "undefined") {
         const checkUserExists = localStorage.getItem("lorify_user_" + savedSession);
         if (checkUserExists) {
             activeSessionUser = savedSession;
             enterMainApp();
-        } else {
-            localStorage.removeItem("lorify_active_session");
+            return true;
         }
     }
+    // Если сессии нет — принудительно выводим стартовое меню
+    showScreen('welcome-screen');
+    return false;
 }
 
-// --- 🎵 ОБНОВЛЕННЫЙ СУПЕР-ДВИЖОК С ФИКСОМ ДЛЯ SAFARI IOS ---
-let isAudioEngineUnlocked = false;
-
-function toggleAudioPlayback() {
-    const audioTrack = document.getElementById("audio-player");
-    const playPauseBtn = document.getElementById("play-pause-btn");
-if (!audioTrack || !playPauseBtn) return;// Скрытый хак Apple: при самом первом тапе принудительно заставляем плеер перезагрузить трек в Safariif (!isAudioEngineUnlocked) {audioTrack.load();isAudioEngineUnlocked = true;}if (audioTrack.paused) {audioTrack.play().then(() => {playPauseBtn.innerText = "❚❚";playPauseBtn.classList.add("playing");}).catch(e => {console.error(e);// Если Safari выдал сбой, пробуем перезапустить через секундуsetTimeout(() => {audioTrack.play();playPauseBtn.innerText = "❚❚";playPauseBtn.classList.add("playing");}, 150);});} else {audioTrack.pause();playPauseBtn.innerText = "▶";playPauseBtn.classList.remove("playing");}}function seekAudioTrack() {const audioTrack = document.getElementById("audio-player");const trackProgressBar = document.getElementById("track-progress-bar");if (!audioTrack || !trackProgressBar || !audioTrack.duration) return;audioTrack.currentTime = audioTrack.duration * (trackProgressBar.value / 100);}function formatAudioTime(seconds) {if (isNaN(seconds) || !isFinite(seconds)) return "0:00";const mins = Math.floor(seconds / 60);const secs = Math.floor(seconds % 60).toString().padStart(2, '0');return ${mins}:${secs};}// Аппаратное навешивание слушателей времениfunction initAudioEventListeners() {const audioTrack = document.getElementById("audio-player");const trackProgressBar = document.getElementById("track-progress-bar");const timeCurrentLabel = document.getElementById("time-current");const timeTotalLabel = document.getElementById("time-total");if (!audioTrack) return;audioTrack.addEventListener("timeupdate", () => {if (!audioTrack.duration || isNaN(audioTrack.duration)) return;if (trackProgressBar) {trackProgressBar.value = (audioTrack.currentTime / audioTrack.duration) * 100;}if (timeCurrentLabel) {timeCurrentLabel.innerText = formatAudioTime(audioTrack.currentTime);}});audioTrack.addEventListener("loadedmetadata", () => {if (timeTotalLabel) timeTotalLabel.innerText = formatAudioTime(audioTrack.duration);});audioTrack.addEventListener("durationchange", () => {if (timeTotalLabel) timeTotalLabel.innerText = formatAudioTime(audioTrack.duration);});// Если трек уже закэшировался в буфер Safariif (audioTrack.duration && timeTotalLabel) {timeTotalLabel.innerText = formatAudioTime(audioTrack.duration);}audioTrack.addEventListener("ended", () => {const playPauseBtn = document.getElementById("play-pause-btn");if (playPauseBtn) {playPauseBtn.innerText = "▶";playPauseBtn.classList.remove("playing");}if (trackProgressBar) trackProgressBar.value = 0;if (timeCurrentLabel) timeCurrentLabel.innerText = "0:00";});}document.addEventListener("DOMContentLoaded", () => {initDateSelectors();checkSavedSessionLive();});
+// СТАБИЛЬНЫЙ ПЛЕЕР С ФИКСОМ ДЛЯ SAFARI
+Используйте код с осторожностью.let isAudioEngineUnlocked = false;function toggleAudioPlayback() {const audioTrack = document.getElementById("audio-player");const playPauseBtn = document.getElementById("play-pause-btn");if (!audioTrack || !playPauseBtn) return;if (!isAudioEngineUnlocked) {audioTrack.load();isAudioEngineUnlocked = true;}if (audioTrack.paused) {audioTrack.play().then(() => {playPauseBtn.innerText = "❚❚";playPauseBtn.classList.add("playing");}).catch(e => {console.error(e);setTimeout(() => {audioTrack.play();playPauseBtn.innerText = "❚❚";playPauseBtn.classList.add("playing");}, 150);});} else {audioTrack.pause();playPauseBtn.innerText = "▶";playPauseBtn.classList.remove("playing");}}function seekAudioTrack() {const audioTrack = document.getElementById("audio-player");const trackProgressBar = document.getElementById("track-progress-bar");if (!audioTrack || !trackProgressBar || !audioTrack.duration) return;audioTrack.currentTime = audioTrack.duration * (trackProgressBar.value / 100);}function formatAudioTime(seconds) {if (isNaN(seconds) || !isFinite(seconds)) return "0:00";const mins = Math.floor(seconds / 60);const secs = Math.floor(seconds % 60).toString().padStart(2, '0');return ${mins}:${secs};}function initAudioEventListeners() {const audioTrack = document.getElementById("audio-player");const trackProgressBar = document.getElementById("track-progress-bar");const timeCurrentLabel = document.getElementById("time-current");const timeTotalLabel = document.getElementById("time-total");if (!audioTrack) return;audioTrack.addEventListener("timeupdate", () => {if (!audioTrack.duration || isNaN(audioTrack.duration)) return;if (trackProgressBar) trackProgressBar.value = (audioTrack.currentTime / audioTrack.duration) * 100;if (timeCurrentLabel) timeCurrentLabel.innerText = formatAudioTime(audioTrack.currentTime);});audioTrack.addEventListener("loadedmetadata", () => {if (timeTotalLabel) timeTotalLabel.innerText = formatAudioTime(audioTrack.duration);});audioTrack.addEventListener("durationchange", () => {if (timeTotalLabel) timeTotalLabel.innerText = formatAudioTime(audioTrack.duration);});audioTrack.addEventListener("ended", () => {const playPauseBtn = document.getElementById("play-pause-btn");if (playPauseBtn) {playPauseBtn.innerText = "▶";playPauseBtn.classList.remove("playing");}if (trackProgressBar) trackProgressBar.value = 0;if (timeCurrentLabel) timeCurrentLabel.innerText = "0:00";});}document.addEventListener("DOMContentLoaded", () => {initDateSelectors();checkSavedSessionLive();});
