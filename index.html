@@ -13,7 +13,7 @@
 
     <div class="app-container">
 
-        <!-- СТРАШНЫЙ ЭКРАН БАНА / УДАЛЕНИЯ АККАУНТА (ИЗНАЧАЛЬНО СПРЯТАН) -->
+        <!-- СТРАШНЫЙ ЭКРАН БАНА / УДАЛЕНИЯ АККАУНТА -->
         <div id="ban-screen" class="ban-overlay" style="display: none;">
             <div class="ban-card">
                 <div class="ban-title">❌ Твой аккаунт удален, создайте новый</div>
@@ -41,10 +41,15 @@
                         <label>Имя</label>
                         <input type="text" id="reg-name" placeholder="Иван">
                     </div>
+                    
+                    <!-- ПОЛЕ ЮЗЕРНЕЙМА С ЖИВОЙ ПРОВЕРКОЙ -->
                     <div class="input-group">
                         <label>Юзернейм</label>
-                        <input type="text" id="reg-username" placeholder="username">
+                        <input type="text" id="reg-username" placeholder="username" oninput="checkUsernameLive()">
+                        <!-- Сюда твой собственный ИИ выведет красный текст ошибки -->
+                        <div id="username-error-msg" class="live-error-text" style="display: none;">юзернейм занят, выберите другой</div>
                     </div>
+                    
                     <div class="input-group">
                         <label>Дата рождения</label>
                         <div class="date-row">
@@ -114,7 +119,7 @@
                     
                     <!-- Скрытая кнопка админки для Drop4ik -->
                     <button class="sidebar-btn admin-btn-style" id="admin-sidebar-btn" onclick="openAdminModal()" style="display: none; pointer-events: auto;">
-                        <span class="sidebar-icon">⚙️</span> Админ панель
+                        <span class="sidebar-icon">⚙️</span> Admin panel
                     </button>
                 </div>
 
