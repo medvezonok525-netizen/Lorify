@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lorify Music</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- Хак против кэша Safari (?v=2.0) заставит iPad принудительно обновить дизайн -->
+    <link rel="stylesheet" href="style.css?v=2.0">
 </head>
 <body>
 
@@ -133,19 +134,20 @@
                 <!-- СТАРТОВЫЙ БЛОК -->
                 <div id="content-welcome" class="content-block">
                     <div class="content-placeholder">
-                        <h1>Музыкальное充Space готово</h1>
+                        <h1>Музыкальное пространство готово</h1>
                         <p>Добро пожаловать на борт Lorify. Перейди в раздел «Все музыки», чтобы открыть свою медиатеку.</p>
                     </div>
                 </div>
 
-                <!-- 🎧 КАРТОЧКА АЛЬБОМА ДИНАСТИЯ В РАЗДЕЛЕ «ВСЕ МУЗЫКИ» -->
+                <!-- 🎧 КАРТОЧКА АЛЬБОМА ДИНАСТИЯ (ИСПРАВЛЕННАЯ СТРУКТУРА ТЕГОВ) -->
                 <div id="content-music" class="content-block" style="display: none; width: 100%;">
                     <div class="music-page-wrapper">
                         
                         <div class="album-card">
-                            <!-- ССЫЛКА НАСТРОЕНА СТРОГО НА ТВОЁ ИМЯ ФАЙЛА IMG_3167.png -->
-                            <img class="album-cover" src="IMG_3167.png" onerror="this.src='https://vercel.app'" alt="Династия">
+                            <!-- 1. КАРТИНКА СТРОГО НА ПЕРВОМ МЕСТЕ (СЛЕВА) -->
+                            <img class="album-cover" src="./IMG_3167.png" alt="Династия">
                             
+                            <!-- 2. БЛОК С ТЕКСТОМ НА ВТОРОМ МЕСТЕ (СПРАВА) -->
                             <div class="album-details">
                                 <div class="album-title">ДИНАСТИЯ</div>
                                 <div class="album-author">VILLIAN & madk1d</div>
