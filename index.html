@@ -4,17 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lorify Music</title>
-    <!-- Обновляем версию до v3.0, чтобы пробить кэш Safari на iPad -->
-    <link rel="stylesheet" href="style.css?v=3.0">
+    <!-- Пробиваем кэш Safari новой версией стилей v4.0 -->
+    <link rel="stylesheet" href="style.css?v=4.0">
 </head>
 <body>
+
+    <!-- НАСТОЯЩИЙ СКРЫТЫЙ СИСТЕМНЫЙ АУДИОПЛЕЕР -->
+    <audio id="audio-player">
+        <!-- Кодируем пробелы и амперсанд, чтобы Vercel и Safari нашли файл без ошибок -->
+        <source src="VILLIAN%20%26%20madk1d%20-%20%D0%94%D0%B8%D0%BD%D0%B0%D1%81%D1%82%D0%B8%D1%8F.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- ПЛАВНЫЙ АНИМИРОВАННЫЙ НЕОНОВЫЙ ФОН -->
     <div class="animated-bg"></div>
 
     <div class="app-container">
 
-        <!-- ЭКРАН БАНА / УДАЛЕНИЯ АККАУНТА -->
+        <!-- ЭКРАН БАНА -->
         <div id="ban-screen" class="ban-overlay" style="display: none;">
             <div class="ban-card">
                 <div class="ban-title">❌ Твой аккаунт удален, создайте новый</div>
@@ -22,10 +28,10 @@
             </div>
         </div>
 
-        <!-- ОБОРУДОВАННЫЙ КОНТЕЙНЕР ДЛЯ ФОРМ АВТОРИЗАЦИИ -->
+        <!-- КОНТЕЙНЕР АВТОРИЗАЦИИ -->
         <div id="auth-box" class="auth-wrapper">
             
-            <!-- 1. СТАРТОВЫЙ ЭКРАН -->
+            <!-- START SCREEN -->
             <div id="welcome-screen" class="inner-screen">
                 <div class="logo-title">Lorify</div>
                 <div class="welcome-buttons">
@@ -34,7 +40,7 @@
                 </div>
             </div>
 
-            <!-- 2. ЭКРАН РЕГИСТРАЦИИ -->
+            <!-- РЕГИСТРАЦИЯ -->
             <div id="register-screen" class="inner-screen" style="display: none;">
                 <div class="form-card">
                     <h2>Создать аккаунт</h2>
@@ -42,13 +48,11 @@
                         <label>Имя</label>
                         <input type="text" id="reg-name" placeholder="Иван">
                     </div>
-                    
                     <div class="input-group">
                         <label>Юзернейм</label>
                         <input type="text" id="reg-username" placeholder="username" oninput="checkUsernameLive()">
                         <div id="username-error-msg" class="live-error-text" style="display: none;">юзернейм занят, выберите другой</div>
                     </div>
-                    
                     <div class="input-group">
                         <label>Дата рождения</label>
                         <div class="date-row">
@@ -70,7 +74,7 @@
                 <div class="back-link" onclick="showScreen('welcome-screen')">Назад</div>
             </div>
 
-            <!-- 3. ЭКРАН УСПЕХА С ГАЛОЧКОЙ -->
+            <!-- УСПЕХ -->
             <div id="success-screen" class="inner-screen" style="display: none;">
                 <div class="success-icon-box">
                     <span class="checkmark">✓</span>
@@ -79,7 +83,7 @@
                 <button class="btn btn-primary" style="max-width: 200px;" onclick="enterMainApp()">Начать</button>
             </div>
 
-            <!-- 4. ЭКРАН ЛОГИНА -->
+            <!-- ЛОГИН -->
             <div id="login-screen" class="inner-screen" style="display: none;">
                 <div class="form-card">
                     <h2>Войти в Lorify</h2>
@@ -98,7 +102,7 @@
 
         </div>
 
-        <!-- 5. ГЛАВНЫЙ ИНТЕРФЕЙС ПЛАТФОРМЫ -->
+        <!-- ГЛАВНЫЙ ИНТЕРФЕЙС ПЛАТФОРМЫ -->
         <div id="main-app-screen" class="screen-full" style="display: none;">
             
             <!-- SIDEBAR -->
@@ -119,7 +123,6 @@
                         <span class="sidebar-icon">👤</span> Профиль
                     </button>
                     
-                    <!-- Скрытая кнопка админки для Drop4ik -->
                     <button class="sidebar-btn admin-btn-style" id="admin-sidebar-btn" onclick="openAdminModal()">
                         <span class="sidebar-icon">⚙️</span> Админ панель
                     </button>
@@ -139,40 +142,51 @@
                     </div>
                 </div>
 
-                <!-- 🎧 ВЕРТИКАЛЬНАЯ СЕТКА КАРТОЧЕК В РАЗДЕЛЕ «ВСЕ МУЗЫКИ» -->
+                <!-- 🎧 ВЕРТИКАЛЬНАЯ СЕТКА С НАСТОЯЩИМ КИБЕР-ПЛЕЕРОМ -->
                 <div id="content-music" class="content-block" style="display: none; width: 100%;">
                     <div class="music-grid-container">
                         
-                        <!-- ПЕРВАЯ ВЕРТИКАЛЬНАЯ КАРТОЧКА АЛЬБОМА -->
+                        <!-- ВЕРТИКАЛЬНАЯ КАРТОЧКА АЛЬБОМА -->
                         <div class="album-card-vertical">
-                            <!-- Картинка теперь строго сверху -->
                             <img class="album-cover-vertical" src="./IMG_3167.png" alt="Династия">
                             
-                            <!-- Описание строго снизу под ней -->
                             <div class="album-details-vertical">
                                 <div class="album-title-vertical">ДИНАСТИЯ</div>
                                 <div class="album-author-vertical">VILLIAN & madk1d</div>
-                                <div class="album-soon-vertical">скоро будет здесь</div>
+                                
+                                <!-- 🎛️ ИНТЕГРИРОВАННЫЙ НЕОНОВЫЙ ПЛЕЕР -->
+                                <div class="player-controls-block">
+                                    
+                                    <!-- Кнопка Воспроизведения / Паузы -->
+                                    <button id="play-pause-btn" class="player-main-btn" onclick="toggleAudioPlayback()">▶</button>
+                                    
+                                    <!-- Полоса прокрутки времени трека -->
+                                    <input type="range" id="track-progress-bar" class="player-slider" value="0" min="0" max="100" oninput="seekAudioTrack()">
+                                    
+                                    <!-- Тайм-коды минут и секунд -->
+                                    <div class="time-counter-row">
+                                        <span id="time-current">0:00</span>
+                                        <span id="time-total">0:00</span>
+                                    </div>
+                                    
+                                </div>
+                                
                             </div>
                         </div>
-
-                        <!-- Сюда в последовательность ты сможешь добавлять новые карточки, они встанут рядом! -->
 
                     </div>
                 </div>
 
             </div>
 
-            <!-- МОДАЛЬНОЕ ОКНО АДМИН-ПАНЕЛИ -->
+            <!-- МОДАЛЬНОЕ ОКНО АДМИНКИ -->
             <div id="admin-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-card">
                     <div class="modal-header">
                         <h3>Панель Администратора [Drop4ik]</h3>
                         <span class="close-modal-btn" onclick="closeAdminModal()">×</span>
                     </div>
-                    
                     <button class="btn btn-primary" style="margin-bottom: 25px;" onclick="loadRegisteredUsers()">Кто зарегистрирован в приложении</button>
-                    
                     <div id="users-log-list">
                         <div style="color: var(--text-muted); text-align: center; font-size: 14px;">Лог-таблица пуста. Нажми кнопку выше для сканирования базы данных.</div>
                     </div>
