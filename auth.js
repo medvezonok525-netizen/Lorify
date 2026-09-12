@@ -32,36 +32,56 @@ function showScreen(screenId) {
     document.getElementById(screenId).style.display = 'flex';
 }
 
-// СВЕРХНАДЕЖНЫЙ МЕТОД ОТПРАВКИ БЕЗ БИБЛИОТЕК ПО СТАНДАРТУ FORM-DATA
+// ЖЕЛЕЗОБЕТОННАЯ ОТПРАВКА ЧЕРЕЗ НЕВИДИМУЮ НАСТОЯЩУЮ HTML-ФОРМУ
 async function sendRealEmail(targetEmail, code) {
     document.getElementById("verify-info-text").innerText = `Отправляем секретный код на почту ${targetEmail}...`;
 
-    // Создаем легальные параметры формы, которые одобряет Apple
-    const formData = new URLSearchParams();
-    formData.append("service_id", EMAILJS_SERVICE_ID);
-    formData.append("template_id", EMAILJS_TEMPLATE_ID);
-    formData.append("user_id", EMAILJS_PUBLIC_KEY);
-    formData.append("email", targetEmail);
-    formData.append("code", code);
+    // 1. Создаем реальную HTML-форму в памяти устройства
+    const hiddenForm = document.createElement('form');
+    hiddenForm.style.display = 'none';
+
+    // 2. Наполняем форму скрытыми инпутами, имена которых жестко привязаны к API EmailJS
+    const fields = {
+        "service_id": EMAILJS_SERVICE_ID,
+        "template_id": EMAILJS_TEMPLATE_ID,
+        "user_id": EMAILJS_PUBLIC_KEY,
+        "email": targetEmail, // Твой тег {{email}} из шаблона
+        "code": code          // Твой тег {{code}} из шаблона
+    };
+
+    for (let key in fields) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = fields[key];
+        hiddenForm.appendChild(input);
+    }
+
+    // Добавляем форму на страницу, чтобы браузер зафиксировал её наличие
+    document.body.appendChild(hiddenForm);
+
+    // 3. Упаковываем форму в стандартный системный объект FormData
+    const realFormData = new FormData(hiddenForm);
 
     try {
+        // Делаем официальный запрос, отправляя НАСТОЯЩУЮ форму
         const response = await fetch("https://emailjs.com", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: formData.toString()
+            body: realFormData
         });
 
         if (response.ok) {
             document.getElementById("verify-info-text").innerHTML = `Письмо успешно улетело! Проверь личный ящик на почте:<br><b style="color:#1db954;">${targetEmail}</b>`;
         } else {
             const errText = await response.text();
-            document.getElementById("verify-info-text").innerText = "Ошибка шлюза: " + errText;
+            document.getElementById("verify-info-text").innerText = "Ошибка шлюза EmailJS: " + errText;
         }
     } catch (e) {
-        document.getElementById("verify-info-text").innerText = "Критический сбой отправки. Попробуй еще раз!";
+        document.getElementById("verify-info-text").innerText = "Браузер заблокировал сетевое соединение. Повтори запрос!";
         console.error(e);
+    } finally {
+        // Полностью удаляем временную форму, чтобы не засорять страницу
+        hiddenForm.remove();
     }
 }
 
