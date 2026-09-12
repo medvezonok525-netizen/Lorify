@@ -41,54 +41,58 @@ function showScreen(screenId) {
     }
 }
 
-// ХАРДВЕРНАЯ ЖИВАЯ ПРОВЕРКА БУКВ ПРЯМО ПРИ НАБОРЕ (БЕЗ ALERT)
-function setupLiveUsernameScanner() {
+// 🔍 ИСПРАВЛЕННАЯ ЖИВАЯ ДЕТЕКЦИЯ: БОЛЬШЕ НИЧЕГО НЕ БЛОКИРУЕТСЯ И ВСЁ НАЖИМАЕТСЯ!
+function checkUsernameLive() {
     const usernameInput = document.getElementById("reg-username");
-    if (!usernameInput) return;
+    const errorMsg = document.getElementById("username-error-msg");
+    const submitBtn = document.getElementById("reg-submit-btn");
 
-    // Вешаем железный перехватчик ввода на инпут
-    usernameInput.addEventListener("input", function() {
-        let inputUsername = usernameInput.value.trim();
-        const errorMsg = document.getElementById("username-error-msg");
-        const submitBtn = document.getElementById("reg-submit-btn");
+    if (!usernameInput || !errorMsg || !submitBtn) return;
 
-        if (!errorMsg || !submitBtn) return;
+    let inputUsername = usernameInput.value.trim().toLowerCase();
 
-        // Удаляем собачку @ спереди или сзади, если юзер её ввёл
-        if (inputUsername.startsWith("@")) {
-            inputUsername = inputUsername.substring(1);
+    if (inputUsername.startsWith("@")) inputUsername = inputUsername.substring(1);
+    if (inputUsername.endsWith("@")) inputUsername = inputUsername.slice(0, -1);
+
+    if (inputUsername === "") {
+        errorMsg.style.display = "none";
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+        return;
+    }
+
+    // Сканируем базу данных на совпадения по регистру символов
+    let isTaken = false;
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.toLowerCase() === "lorify_user_" + inputUsername) {
+            isTaken = true;
+            break;
         }
-        if (inputUsername.endsWith("@")) {
-            inputUsername = inputUsername.slice(0, -1);
-        }
+    }
 
-        if (inputUsername === "") {
-            errorMsg.style.display = "none";
-            submitBtn.disabled = false;
-            submitBtn.style.opacity = "1";
-            return;
-        }
+    if (isTaken) {
+        errorMsg.style.display = "block";
+        submitBtn.disabled = true; // Замораживаем кнопку только если ник совпал
+        submitBtn.style.opacity = "0.4";
+    } else {
+        errorMsg.style.display = "none";
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+    }
+}
 
-        // Прямое попиксельное сканирование локальной базы данных
-        const isUserTaken = localStorage.getItem("lorify_user_" + inputUsername);
-
-        if (isUserTaken) {
-            // Мгновенно выкатываем сочный красный текст строго под инпутом
-            errorMsg.style.display = "block";
-            submitBtn.disabled = true; // Блокируем кнопку намертво
-            submitBtn.style.opacity = "0.4";
-        } else {
-            // Прячем ошибку и разблокируем кнопку, если имя свободно
-            errorMsg.style.display = "none";
-            submitBtn.disabled = false;
-            submitBtn.style.opacity = "1";
-        }
-    });
+// ПЕРЕКЛЮЧЕНИЕ МЕЖДУ СТРАНИЦАМИ ВНУТРИ САЙДБАРА
+function changeContentArea(blockName) {
+    document.querySelectorAll('.content-block').forEach(b => b.style.display = 'none');
+    const targetBlock = document.getElementById('content-' + blockName);
+    if (targetBlock) targetBlock.style.display = 'block';
 }
 
 function enterMainApp() {
     document.getElementById('auth-box').style.display = 'none';
     document.getElementById('main-app-screen').style.display = 'flex';
+    changeContentArea('welcome'); // Сбрасываем контент на стартовый
 
     const adminBtn = document.getElementById('admin-sidebar-btn');
     if (adminBtn) {
@@ -119,7 +123,7 @@ function resetAfterBan() {
     showScreen('welcome-screen');
 }
 
-// РЕГИСТРАЦИЯ (ОКОНЧАТЕЛЬНО ВЫРЕЗАН СТАРЫЙ ALERT ИЗНУТРИ)
+// РЕГИСТРАЦИЯ
 function processRegistration() {
     const name = document.getElementById("reg-name").value.trim();
     let username = document.getElementById("reg-username").value.trim();
@@ -137,11 +141,6 @@ function processRegistration() {
     }
     if (pass !== confirm) {
         alert("Пароли не совпадают!"); return;
-    }
-    
-    // Если юзернейм занят — функция молча останавливается, никакого alert больше нет!
-    if (localStorage.getItem("lorify_user_" + username)) {
-        return; 
     }
 
     const now = new Date();
@@ -164,6 +163,7 @@ function processRegistration() {
     document.getElementById("reg-confirm").value = "";
 }
 
+// ВХОД
 function processLogin() {
     let username = document.getElementById("login-username").value.trim();
     const pass = document.getElementById("login-pass").value;
@@ -230,8 +230,6 @@ function deleteUserCard(targetUsername) {
     }
 }
 
-// Запуск при старте приложения
 document.addEventListener("DOMContentLoaded", () => {
     initDateSelectors();
-    setupLiveUsernameScanner(); // Форсируем включение живого перехватчика ввода букв
 });
