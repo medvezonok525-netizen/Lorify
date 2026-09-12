@@ -44,7 +44,6 @@ function showScreen(screenId) {
 function sendRealEmail(targetEmail, code) {
     document.getElementById("verify-info-text").innerText = `Отправляем секретный код на почту ${targetEmail}...`;
     
-    // Передаем параметры строго по названиям твоих тегов {{email}} и {{code}} из шаблона
     const templateParams = {
         email: targetEmail,
         code: code
