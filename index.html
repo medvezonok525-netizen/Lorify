@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lorify Music</title>
-    <!-- Форсируем сброс кэша новой версией v8.0 -->
-    <link rel="stylesheet" href="style.css?v=8.0">
+    <!-- Форсируем сброс кэша новой версией v9.0 -->
+    <link rel="stylesheet" href="style.css?v=9.0">
 </head>
 <body>
 
-    <!-- НАСТОЯЩИЙ СИСТЕМНЫЙ АУДИОПЛЕЕР С ЧИСТЫМ ПУТЕМ НА ЛАТИНИЦЕ -->
+    <!-- НАСТОЯЩИЙ СИСТЕМНЫЙ АУДИОПЛЕЕР С ПРЯМОЙ ЧИСТОЙ ССЫЛКОЙ -->
     <audio id="audio-player" preload="auto">
         <source src="./dinastiya.mp3" type="audio/mpeg">
     </audio>
@@ -30,7 +30,7 @@
         <div id="auth-box" class="auth-wrapper">
             
             <!-- START SCREEN -->
-            <div id="welcome-screen" class="inner-screen">
+            <div id="welcome-screen" class="inner-screen" style="display: none;">
                 <div class="logo-title">Lorify</div>
                 <div class="welcome-buttons">
                     <button class="btn btn-primary" onclick="showScreen('register-screen')">Регистрация</button>
@@ -121,7 +121,6 @@
                         <span class="sidebar-icon">👤</span> Профиль
                     </button>
                     
-                    <!-- Скрытая кнопка админки для Drop4ik -->
                     <button class="sidebar-btn admin-btn-style" id="admin-sidebar-btn" onclick="openAdminModal()">
                         <span class="sidebar-icon">⚙️</span> Админ панель
                     </button>
@@ -186,6 +185,5 @@
 
     </div>
 
-    <script src="auth.js"></script>
 </body>
 </html>
