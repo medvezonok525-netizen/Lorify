@@ -1,12 +1,4 @@
-// Официальная инициализация публичного ключа, разрешенная в iOS/Safari
-(function() {
-    if (window.emailjs) {
-        emailjs.init({
-            publicKey: "aEOYJY9gCW0UtmEsW",
-        });
-    }
-})();
-
+// Инициализируем локальную базу данных и тестовый аккаунт Drop4ik
 if (!localStorage.getItem("lorify_user_Drop4ik")) {
     const testAcc = {
         email: "drop@lorify.music", name: "Разработчик", username: "Drop4ik", birthday: "01.01.2000", pass: "123"
@@ -17,6 +9,7 @@ if (!localStorage.getItem("lorify_user_Drop4ik")) {
 // ТВОИ ЛИЧНЫЕ РАБОЧИЕ КЛЮЧИ EMAILJS
 const EMAILJS_SERVICE_ID = "service_j9uyo3g";  
 const EMAILJS_TEMPLATE_ID = "template_zcw57ql"; 
+const EMAILJS_PUBLIC_KEY = "aEOYJY9gCW0UtmEsW";   
 
 let generatedCode = ""; 
 let tempRegistrationData = null; 
@@ -40,26 +33,37 @@ function showScreen(screenId) {
     document.getElementById(screenId).style.display = 'flex';
 }
 
-// ОФИЦИАЛЬНЫЙ СПОСОБ ОТПРАВКИ, КОТОРЫЙ SAFARI НЕ БЛОКИРУЕТ
-function sendRealEmail(targetEmail, code) {
+// НАПРЯМУЮ ЧЕРЕЗ ЧИСТЫЙ И НЕЗАВИСИМЫЙ API-FETCH ЗАПРОС К СЕРВЕРУ
+async function sendRealEmail(targetEmail, code) {
     document.getElementById("verify-info-text").innerText = `Отправляем секретный код на почту ${targetEmail}...`;
     
-    const templateParams = {
-        email: targetEmail,
-        code: code
-    };
+    try {
+        const response = await fetch("https://emailjs.com", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({
+                service_id: EMAILJS_SERVICE_ID,
+                template_id: EMAILJS_TEMPLATE_ID,
+                user_id: EMAILJS_PUBLIC_KEY,
+                template_params: {
+                    email: targetEmail,
+                    code: code          
+                }
+            })
+        });
 
-    if (window.emailjs) {
-        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-            .then(function(response) {
-                document.getElementById("verify-info-text").innerHTML = `Письмо успешно улетело! Проверь личный ящик на почте:<br><b style="color:#1db954;">${targetEmail}</b>`;
-                console.log('SUCCESS!', response.status, response.text);
-            }, function(error) {
-                document.getElementById("verify-info-text").innerText = "Ошибка шлюза отправки. Ответ сервера: " + JSON.stringify(error);
-                console.error('FAILED...', error);
-            });
-    } else {
-        document.getElementById("verify-info-text").innerText = "Критическая ошибка: почтовый модуль не загрузился.";
+        if (response.ok) {
+            document.getElementById("verify-info-text").innerHTML = `Письмо успешно улетело! Проверь личный ящик на почте:<br><b style="color:#1db954;">${targetEmail}</b>`;
+        } else {
+            const errText = await response.text();
+            document.getElementById("verify-info-text").innerText = "Ответ сервера шлюза: " + errText;
+            console.error(errText);
+        }
+    } catch (e) {
+        document.getElementById("verify-info-text").innerText = "Ошибка блокировки запроса браузером. Повтори!";
+        console.error(e);
     }
 }
 
