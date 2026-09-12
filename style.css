@@ -1,6 +1,6 @@
 :root {
     --bg-dark: #090a0f;
-    --bg-card: rgba(18, 19, 26, 0.75);
+    --bg-card: rgba(18, 19, 26, 0.7);
     --accent-green: #1db954;
     --text-main: #f5f5f7;
     --text-muted: #7e7e86;
@@ -82,37 +82,45 @@ html, body {
 .logout-btn { width: 100%; padding: 14px; font-size: 14px; font-weight: 700; color: #ff3b30; background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.2); border-radius: 12px; cursor: pointer; transition: all 0.2s; pointer-events: auto; }
 .logout-btn:active { transform: scale(0.97); background: rgba(255, 59, 48, 0.15); }
 
+/* ✨ ИСПРАВЛЕНО: ПРИЖИМАЕМ ЗОНУ КОНТЕНТА К САЙДБАРУ ДЛЯ ПОСЛЕДОВАТЕЛЬНОГО РЯДА */
 .main-content { 
     flex: 1; height: 100%; 
-    display: flex; justify-content: center; align-items: center; 
-    box-sizing: border-box; padding: 40px; 
+    display: flex; justify-content: flex-start; align-items: flex-start; 
+    box-sizing: border-box; padding: 60px 40px; 
     margin-left: 280px; width: calc(100% - 280px);
+    overflow-x: auto; /* Появится горизонтальный скролл если треков будет очень много */
 }
 .content-placeholder { text-align: center; max-width: 480px; margin: auto; }
 .content-placeholder h1 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
 .content-placeholder p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
 
 .music-page-wrapper { 
-    width: 100%; display: flex; justify-content: center; align-items: center; 
-    animation: screenFadeIn 0.4s ease forwards; 
+    width: 100%; display: flex; justify-content: flex-start; align-items: flex-start; 
 }
 
-/* 🎧 ЖЕСТКАЯ ФИКСАЦИЯ СТРУКТУРЫ КАРТОЧКИ: ДИРЕКТИВА ROW ПРИНУДИТЕЛЬНО РАЗВОРАЧИВАЕТ ЭЛЕМЕНТЫ СЛЕВА НАПРАВО */
-.album-card { 
-    background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; 
-    padding: 35px; display: flex; flex-direction: row !important; align-items: center; justify-content: flex-start; gap: 35px; 
-    max-width: 620px; width: 100%; box-shadow: 0 25px 55px rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px); 
+/* 🏁 СЕТКА ДЛЯ ВЫСТРАИВАНИЯ ОБЪЕКТОВ СЛЕВА НАПРАВО */
+.music-grid-container {
+    display: flex; flex-direction: row; gap: 24px; justify-content: flex-start; align-items: flex-start; width: 100%;
 }
 
-.album-cover { 
-    width: 160px; height: 160px; object-fit: cover; border-radius: 16px; 
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); display: block;
+/* 🎧 КОМПАКТНАЯ ВЕРТИКАЛЬНАЯ КАРТОЧКА ТРЕКА */
+.album-card-vertical {
+    background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px;
+    padding: 16px; display: flex; flex-direction: column !important; align-items: flex-start; gap: 14px;
+    width: 200px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); backdrop-filter: blur(20px);
+    transition: transform 0.2s, background 0.2s;
+}
+.album-card-vertical:hover { transform: translateY(-4px); background: rgba(255,255,255,0.02); }
+
+.album-cover-vertical {
+    width: 100%; height: 168px; object-fit: cover; border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
 }
 
-.album-details { display: flex; flex-direction: column; gap: 8px; text-align: left; }
-.album-title { font-size: 36px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px; }
-.album-author { font-size: 20px; font-weight: 700; color: var(--accent-green); }
-.album-soon { font-size: 15px; font-weight: 500; color: var(--text-muted); text-transform: lowercase; margin-top: 12px; }
+.album-details-vertical { display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left; }
+.album-title-vertical { font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.album-author-vertical { font-size: 14px; font-weight: 700; color: var(--accent-green); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.album-soon-vertical { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: lowercase; margin-top: 4px; }
 
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
 .modal-card { background-color: #12131a; border: 1px solid var(--border-color); width: 90%; max-width: 550px; max-height: 80vh; border-radius: 24px; box-sizing: border-box; padding: 30px; display: flex; flex-direction: column; }
@@ -125,8 +133,3 @@ html, body {
 .user-log-item { font-size: 14px; color: #e5e5ea; line-height: 1.4; padding: 12px 16px; background-color: rgba(255,255,255,0.02); border-radius: 8px; border-left: 3px solid var(--accent-green); display: flex; justify-content: space-between; align-items: center; gap: 15px; }
 .user-log-item b { color: var(--accent-green); }
 .delete-user-btn { padding: 6px 14px; font-size: 12px; font-weight: 700; color: #ffffff; background-color: #ff3b30; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
-.delete-user-btn:hover { background-color: #e03228; }
-.delete-user-btn:active { transform: scale(0.96); }
-
-.live-error-text { font-size: 12px; font-weight: 700; color: #ff3b30; text-transform: lowercase; margin-top: 6px; padding-left: 4px; letter-spacing: 0.3px; width: 100%; text-align: left; }
-@keyframes screenFadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
