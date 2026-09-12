@@ -5,10 +5,12 @@ if (!localStorage.getItem("lorify_user_Drop4ik")) {
         username: "Drop4ik", 
         birthday: "01.01.2000", 
         pass: "123",
-        regTime: "Вшит в ядро системы" // Вечный статус создателя
+        regTime: "Вшит в ядро системы"
     };
     localStorage.setItem("lorify_user_Drop4ik", JSON.stringify(testAcc));
 }
+
+let activeSessionUser = ""; // Буфер текущего вошедшего юзера
 
 function initDateSelectors() {
     const daySelect = document.getElementById("reg-day");
@@ -24,29 +26,29 @@ function initDateSelectors() {
     for(let i = currentYear; i >= 1930; i--) yearSelect.options.add(new Option(i, i.toString()));
 }
 
-function showScreen(screenId, currentUsername = "") {
-    document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-    
-    const mainApp = document.getElementById('main-app-screen');
-    if (mainApp) mainApp.style.display = 'none';
-
+// ПЛАВНОЕ И НАДЁЖНОЕ ПЕРЕКЛЮЧЕНИЕ КАРТОЧЕК ВХОДА
+function showScreen(screenId) {
+    document.querySelectorAll('.inner-screen').forEach(s => s.style.display = 'none');
     const target = document.getElementById(screenId);
-    if (target) {
-        target.style.display = 'flex';
-        
-        // КЛЮЧЕВАЯ ЛОГИКА: Если вошёл Drop4ik — принудительно выкатываем кнопку админки!
-        const adminBtn = document.getElementById('admin-sidebar-btn');
-        if (adminBtn) {
-            if (screenId === 'main-app-screen' && currentUsername === 'Drop4ik') {
-                adminBtn.style.display = 'flex';
-            } else if (screenId === 'welcome-screen') {
-                adminBtn.style.display = 'none'; // Гасим при логауте
-            }
+    if (target) target.style.display = 'flex';
+}
+
+// ВХОД В ПОЛНОЭКРАННОЕ ПРИЛОЖЕНИЕ (С АВТО-ПРОВЕРКОЙ НА АДМИНА)
+function enterMainApp() {
+    document.getElementById('auth-box').style.display = 'none';
+    document.getElementById('main-app-screen').style.display = 'flex';
+
+    const adminBtn = document.getElementById('admin-sidebar-btn');
+    if (adminBtn) {
+        if (activeSessionUser === 'Drop4ik') {
+            adminBtn.style.display = 'flex';
+        } else {
+            adminBtn.style.display = 'none';
         }
     }
 }
 
-// РЕГИСТРАЦИЯ С ФИКСАЦИЕЙ ВРЕМЕНИ
+// РЕГИСТРАЦИЯ
 function processRegistration() {
     const name = document.getElementById("reg-name").value.trim();
     const username = document.getElementById("reg-username").value.trim();
@@ -66,7 +68,6 @@ function processRegistration() {
         alert("Этот юзернейм уже занят!"); return;
     }
 
-    // Считываем точное время с iPad
     const now = new Date();
     const monthsArr = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
     const formattedTime = `${now.getDate()} ${monthsArr[now.getMonth()]} ${now.getFullYear()} г., ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
@@ -76,15 +77,14 @@ function processRegistration() {
         username: username,
         birthday: `${day}.${month}.${year}`,
         pass: pass,
-        regTime: formattedTime // Сохраняем дату в базу
+        regTime: formattedTime
     };
 
     localStorage.setItem("lorify_user_" + username, JSON.stringify(userData));
+    activeSessionUser = username;
 
     document.getElementById("welcome-user-title").innerText = `Добро пожаловать, ${username}`;
-    
-    // Передаем никнейм в навигатор, чтобы проверить на права админа
-    showScreen('success-screen', username);
+    showScreen('success-screen');
 
     document.getElementById("reg-name").value = "";
     document.getElementById("reg-username").value = "";
@@ -105,54 +105,42 @@ function processLogin() {
             document.getElementById("login-username").value = "";
             document.getElementById("login-pass").value = "";
             
-            // Передаем никнейм во внутренний шлюз
-            showScreen('main-app-screen', username);
+            activeSessionUser = username; // Фиксируем сессию
+            enterMainApp(); // Залетаем в плеер
         } else { alert("Неверный пароль!"); }
     } else { alert("Пользователь не найден!"); }
 }
 
-// ⚙️ СИСТЕМНЫЕ СКРИПТЫ АДМИН-ПАНЕЛИ (КЛАСТЕР ДАННЫХ)
-function openAdminModal() {
-    document.getElementById('admin-modal').style.display = 'flex';
+// ЖЕЛЕЗОБЕТОННЫЙ ВЫХОД: ПУСТОЙ ЭКРАН ТЕПЕРЬ ПОЛНОСТЬЮ ИСКЛЮЧЕН
+function logoutBoba() { 
+    activeSessionUser = "";
+    document.getElementById('main-app-screen').style.display = 'none';
+    document.getElementById('auth-box').style.display = 'block';
+    showScreen('welcome-screen'); 
 }
 
-function closeAdminModal() {
-    document.getElementById('admin-modal').style.display = 'none';
-}
+// АДМИНКА
+function openAdminModal() { document.getElementById('admin-modal').style.display = 'flex'; }
+function closeAdminModal() { document.getElementById('admin-modal').style.display = 'none'; }
 
-// СКАНИРОВАНИЕ БАЗЫ ДАННЫХ ПО КЛИКУ НА КНОПКУ ПАНЕЛИ
 function loadRegisteredUsers() {
     const logContainer = document.getElementById('users-log-list');
-    logContainer.innerHTML = ""; // Сбрасываем старый текст
-
+    logContainer.innerHTML = "";
     let foundUsers = [];
 
-    // Бежим по всей памяти iPad и вытаскиваем ключи пользователей
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith("lorify_user_")) {
-            const userObj = JSON.parse(localStorage.getItem(key));
-            foundUsers.push(userObj);
+            foundUsers.push(JSON.parse(localStorage.getItem(key)));
         }
     }
 
-    // Если никого нет кроме Drop4ik (хотя Drop4ik там будет всегда)
-    if (foundUsers.length === 0) {
-        logContainer.innerHTML = `<div style="color: #ff3b30; text-align: center;">Пользователи не обнаружены.</div>`;
-        return;
-    }
-
-    // Выводим данные в ТЗ формате: {user} зарегистрирован с {дата, время, год}
     foundUsers.forEach(user => {
         const logItem = document.createElement('div');
         logItem.className = 'user-log-item';
         logItem.innerHTML = `<b>${user.username}</b> зарегистрирован с ${user.regTime}`;
         logContainer.appendChild(logItem);
     });
-}
-
-function logoutBoba() { 
-    showScreen('welcome-screen'); 
 }
 
 document.addEventListener("DOMContentLoaded", () => {
