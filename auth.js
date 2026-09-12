@@ -257,3 +257,69 @@ document.addEventListener("DOMContentLoaded", () => {
     initDateSelectors();
     checkSavedSessionLive();
 });
+// --- 🎵 ИНТЕЛЛЕКТУАЛЬНЫЙ АУДИОДВИЖОК LORIFY PLAYER ---
+const audioTrack = document.getElementById("audio-player");
+const playPauseBtn = document.getElementById("play-pause-btn");
+const trackProgressBar = document.getElementById("track-progress-bar");
+const timeCurrentLabel = document.getElementById("time-current");
+const timeTotalLabel = document.getElementById("time-total");
+
+// Включение / Пауза трека
+function toggleAudioPlayback() {
+    if (!audioTrack || !playPauseBtn) return;
+
+    if (audioTrack.paused) {
+        audioTrack.play()
+            .then(() => {
+                playPauseBtn.innerText = "❚❚"; // Меняем значок на паузу
+                playPauseBtn.classList.add("playing");
+            })
+            .catch(e => alert("Ошибка запуска звука. Кликни по экрану ещё раз: " + e.message));
+    } else {
+        audioTrack.pause();
+        playPauseBtn.innerText = "▶"; // Меняем значок на плей
+        playPauseBtn.classList.remove("playing");
+    }
+}
+
+// Перемотка трека пальцем по ползунку слайдера
+function seekAudioTrack() {
+    if (!audioTrack || !trackProgressBar) return;
+    const seekToTime = audioTrack.duration * (trackProgressBar.value / 100);
+    audioTrack.currentTime = seekToTime;
+}
+
+// Форматирование секунд в красивый вид 0:00
+function formatAudioTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+}
+
+// Автоматическое обновление ползунка и счетчиков времени каждую секунду проигрывания
+if (audioTrack) {
+    audioTrack.addEventListener("timeupdate", () => {
+        if (!audioTrack.duration) return;
+        
+        // Считаем процент трека для ползунка
+        const progressPercentage = (audioTrack.currentTime / audioTrack.duration) * 100;
+        trackProgressBar.value = progressPercentage;
+        
+        // Обновляем текущие минуты на экране
+        timeCurrentLabel.innerText = formatAudioTime(audioTrack.currentTime);
+    });
+
+    // Как только трек полностью прогрузился — считываем его общую длину
+    audioTrack.addEventListener("loadedmetadata", () => {
+        timeTotalLabel.innerText = formatAudioTime(audioTrack.duration);
+    });
+    
+    // Если песня доиграла до самого конца — сбрасываем кнопку на дефолт
+    audioTrack.addEventListener("ended", () => {
+        playPauseBtn.innerText = "▶";
+        playPauseBtn.classList.remove("playing");
+        trackProgressBar.value = 0;
+        timeCurrentLabel.innerText = "0:00";
+    });
+}
