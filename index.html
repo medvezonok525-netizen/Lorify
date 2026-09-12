@@ -13,7 +13,7 @@
 
     <div class="app-container">
 
-        <!-- СТРАШНЫЙ ЭКРАН БАНА / УДАЛЕНИЯ АККАУНТА -->
+        <!-- ЭКРАН БАНА / УДАЛЕНИЯ АККАУНТА -->
         <div id="ban-screen" class="ban-overlay" style="display: none;">
             <div class="ban-card">
                 <div class="ban-title">❌ Твой аккаунт удален, создайте новый</div>
@@ -42,11 +42,10 @@
                         <input type="text" id="reg-name" placeholder="Иван">
                     </div>
                     
-                    <!-- ПОЛЕ ЮЗЕРНЕЙМА С ХАРДВЕРНЫМ СЛУШАТЕЛЕМ -->
                     <div class="input-group">
                         <label>Юзернейм</label>
-                        <input type="text" id="reg-username" placeholder="username">
-                        <!-- Твой сочный красный текст строго под инпутом -->
+                        <!-- Чистый тег инпута, слушатель теперь привязан аппаратно -->
+                        <input type="text" id="reg-username" placeholder="username" oninput="checkUsernameLive()">
                         <div id="username-error-msg" class="live-error-text" style="display: none;">юзернейм занят, выберите другой</div>
                     </div>
                     
@@ -107,6 +106,10 @@
                 <div class="sidebar-logo">Lorify</div>
                 
                 <div class="sidebar-menu">
+                    <!-- Новая рабочая кнопка треков -->
+                    <button class="sidebar-btn menu-active-btn" onclick="changeContentArea('music')">
+                        <span class="sidebar-icon">🎵</span> Все музыки
+                    </button>
                     <button class="sidebar-btn">
                         <span class="sidebar-icon">🕒</span> История прослушиваний
                     </button>
@@ -118,7 +121,7 @@
                     </button>
                     
                     <!-- Скрытая кнопка админки для Drop4ik -->
-                    <button class="sidebar-btn admin-btn-style" id="admin-sidebar-btn" onclick="openAdminModal()" style="display: none; pointer-events: auto;">
+                    <button class="sidebar-btn admin-btn-style" id="admin-sidebar-btn" onclick="openAdminModal()">
                         <span class="sidebar-icon">⚙️</span> Админ панель
                     </button>
                 </div>
@@ -126,12 +129,35 @@
                 <button class="logout-btn" onclick="logoutBoba()">Выйти из аккаунта</button>
             </div>
 
-            <!-- ЗОНА КОНТЕНТА -->
+            <!-- ДИНАМИЧЕСКАЯ ЗОНА КОНТЕНТА -->
             <div class="main-content">
-                <div class="content-placeholder">
-                    <h1>Музыкальное пространство готово</h1>
-                    <p>Добро пожаловать на борт Lorify. Скоро здесь появится твоя медиатека.</p>
+                
+                <!-- АВТОМАТИЧЕСКИЙ СТАРТОВЫЙ БЛОК -->
+                <div id="content-welcome" class="content-block">
+                    <div class="content-placeholder">
+                        <h1>Музыкальное пространство готово</h1>
+                        <p>Добро пожаловать на борт Lorify. Перейди в раздел «Все музыки», чтобы открыть свою медиатека.</p>
+                    </div>
                 </div>
+
+                <!-- 🎧 КАРТОЧКА АЛЬБОМА ДИНАСТИЯ В РАЗДЕЛЕ «ВСЕ МУЗЫКИ» -->
+                <div id="content-music" class="content-block" style="display: none; width: 100%;">
+                    <div class="music-page-wrapper">
+                        
+                        <div class="album-card">
+                            <!-- Картинка обложки прямо с твоего репозитория Vercel -->
+                            <img class="album-cover" src="https://vercel.app" onerror="this.src='https://githubusercontent.com'" alt="Династия">
+                            
+                            <div class="album-details">
+                                <div class="album-title">ДИНАСТИЯ</div>
+                                <div class="album-author">VILLIAN & madk1d</div>
+                                <div class="album-soon">скоро будет здесь</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
 
             <!-- МОДАЛЬНОЕ ОКНО АДМИН-ПАНЕЛИ -->
