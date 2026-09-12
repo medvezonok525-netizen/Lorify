@@ -13,6 +13,14 @@
 
     <div class="app-container">
 
+        <!-- СТРАШНЫЙ ЭКРАН БАНА / УДАЛЕНИЯ АККАУНТА (ИЗНАЧАЛЬНО СПРЯТАН) -->
+        <div id="ban-screen" class="ban-overlay" style="display: none;">
+            <div class="ban-card">
+                <div class="ban-title">❌ Твой аккаунт удален, создайте новый</div>
+                <button class="btn btn-secondary" onclick="resetAfterBan()">В меню</button>
+            </div>
+        </div>
+
         <!-- ОБОРУДОВАННЫЙ КОНТЕЙНЕР ДЛЯ ФОРМ АВТОРИЗАЦИИ -->
         <div id="auth-box" class="auth-wrapper">
             
