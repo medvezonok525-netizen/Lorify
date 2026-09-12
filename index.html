@@ -44,7 +44,6 @@
                     
                     <div class="input-group">
                         <label>Юзернейм</label>
-                        <!-- Чистый тег инпута, слушатель теперь привязан аппаратно -->
                         <input type="text" id="reg-username" placeholder="username" oninput="checkUsernameLive()">
                         <div id="username-error-msg" class="live-error-text" style="display: none;">юзернейм занят, выберите другой</div>
                     </div>
@@ -106,8 +105,8 @@
                 <div class="sidebar-logo">Lorify</div>
                 
                 <div class="sidebar-menu">
-                    <!-- Новая рабочая кнопка треков -->
-                    <button class="sidebar-btn menu-active-btn" onclick="changeContentArea('music')">
+                    <!-- Добавлен класс clickable-btn для обхода блокировок Safari -->
+                    <button class="sidebar-btn clickable-btn" onclick="changeContentArea('music')">
                         <span class="sidebar-icon">🎵</span> Все музыки
                     </button>
                     <button class="sidebar-btn">
@@ -136,7 +135,7 @@
                 <div id="content-welcome" class="content-block">
                     <div class="content-placeholder">
                         <h1>Музыкальное пространство готово</h1>
-                        <p>Добро пожаловать на борт Lorify. Перейди в раздел «Все музыки», чтобы открыть свою медиатека.</p>
+                        <p>Добро пожаловать на борт Lorify. Перейди в раздел «Все музыки», чтобы открыть свою медиатеку.</p>
                     </div>
                 </div>
 
@@ -145,8 +144,7 @@
                     <div class="music-page-wrapper">
                         
                         <div class="album-card">
-                            <!-- Картинка обложки прямо с твоего репозитория Vercel -->
-                            <img class="album-cover" src="https://vercel.app" onerror="this.src='https://githubusercontent.com'" alt="Династия">
+                            <img class="album-cover" src="image_GTgHXv.png" onerror="this.src='https://vercel.app'" alt="Династия">
                             
                             <div class="album-details">
                                 <div class="album-title">ДИНАСТИЯ</div>
