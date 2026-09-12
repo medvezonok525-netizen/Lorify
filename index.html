@@ -8,6 +8,9 @@
 </head>
 <body>
 
+    <!-- ПЛАВНЫЙ АНИМИРОВАННЫЙ НЕОНОВЫЙ ФОН -->
+    <div class="animated-bg"></div>
+
     <div class="app-container">
 
         <!-- 1. СТАРТОВЫЙ ЭКРАН -->
@@ -58,7 +61,7 @@
                 <span class="checkmark">✓</span>
             </div>
             <div class="welcome-user-text" id="welcome-user-title">Добро пожаловать, user</div>
-            <button class="btn btn-primary" style="max-width: 200px;" onclick="showScreen('soon-screen')">Начать</button>
+            <button class="btn btn-primary" style="max-width: 200px;" onclick="showScreen('main-app-screen')">Начать</button>
         </div>
 
         <!-- 4. ЭКРАН ЛОГИНА -->
@@ -78,10 +81,58 @@
             <div class="back-link" onclick="showScreen('welcome-screen')">Назад</div>
         </div>
 
-        <!-- 5. ЭКРАН СКОРО -->
-        <div id="soon-screen" class="screen">
-            <div class="soon-text">soon</div>
-            <div class="back-link" style="margin-top: 40px;" onclick="logoutBoba()">Выйти из аккаунта</div>
+        <!-- 5. ГЛАВНЫЙ ИНТЕРФЕЙС ПЛАТФОРМЫ -->
+        <div id="main-app-screen" class="screen-full">
+            
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <div class="sidebar-logo">Lorify</div>
+                
+                <div class="sidebar-menu">
+                    <button class="sidebar-btn">
+                        <span class="sidebar-icon">🕒</span> История прослушиваний
+                    </button>
+                    <button class="sidebar-btn">
+                        <span class="sidebar-icon">🔥</span> Популярные треки
+                    </button>
+                    <button class="sidebar-btn">
+                        <span class="sidebar-icon">👤</span> Профиль
+                    </button>
+                    
+                    <!-- Скрытая кнопка админки для Drop4ik (изначально спрятана) -->
+                    <button class="sidebar-btn admin-btn-style" id="admin-sidebar-btn" onclick="openAdminModal()" style="display: none; pointer-events: auto;">
+                        <span class="sidebar-icon">⚙️</span> Админ панель
+                    </button>
+                </div>
+
+                <button class="logout-btn" onclick="logoutBoba()">Выйти из аккаунта</button>
+            </div>
+
+            <!-- ЗОНА КОНТЕНТА -->
+            <div class="main-content">
+                <div class="content-placeholder">
+                    <h1>Музыкальное пространство готово</h1>
+                    <p>Добро пожаловать на борт Lorify. Скоро здесь появится твоя медиатека.</p>
+                </div>
+            </div>
+
+            <!-- МОДАЛЬНОЕ ОКНО АДМИН-ПАНЕЛИ -->
+            <div id="admin-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h3>Панель Администратора [Drop4ik]</h3>
+                        <span class="close-modal-btn" onclick="closeAdminModal()">×</span>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="margin-bottom: 25px;" onclick="loadRegisteredUsers()">Кто зарегистрирован в приложении</button>
+                    
+                    <!-- Зона вывода списка всех пользователей -->
+                    <div id="users-log-list">
+                        <div style="color: var(--text-muted); text-align: center; font-size: 14px;">Лог-таблица пуста. Нажми кнопку выше для сканирования базы данных.</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
