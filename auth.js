@@ -11,7 +11,7 @@ if (!localStorage.getItem("lorify_user_Drop4ik")) {
 }
 
 let activeSessionUser = ""; 
-let liveSyncCheck = null; // Переменная фонового таймера проверки удаления
+let liveSyncCheck = null; 
 
 function initDateSelectors() {
     const daySelect = document.getElementById("reg-day");
@@ -31,6 +31,51 @@ function showScreen(screenId) {
     document.querySelectorAll('.inner-screen').forEach(s => s.style.display = 'none');
     const target = document.getElementById(screenId);
     if (target) target.style.display = 'flex';
+    
+    // Сбрасываем ошибку юзернейма при переходах между экранами
+    const errorMsg = document.getElementById("username-error-msg");
+    const submitBtn = document.getElementById("reg-submit-btn");
+    if (errorMsg && submitBtn) {
+        errorMsg.style.display = "none";
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+    }
+}
+
+// --- 🔍 ТВОЙ ЛИЧНЫЙ ЖИВОЙ ДЕТЕКТОР ЗАНЯТЫХ НИКНЕЙМОВ ---
+function checkUsernameLive() {
+    let inputUsername = document.getElementById("reg-username").value.trim();
+    const errorMsg = document.getElementById("username-error-msg");
+    const submitBtn = document.getElementById("reg-submit-btn");
+
+    if (!errorMsg || !submitBtn) return;
+
+    // Хак: Если юзер вводит имя со знаком @ на конце или начале (например @lolka) — стираем @ для правильной проверки базы
+    if (inputUsername.startsWith("@")) {
+        inputUsername = inputUsername.substring(1);
+    }
+
+    if (inputUsername === "") {
+        errorMsg.style.display = "none";
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+        return;
+    }
+
+    // Проверяем наличие ключа в localStorage устройства
+    const isUserTaken = localStorage.getItem("lorify_user_" + inputUsername);
+
+    if (isUserTaken) {
+        // Если имя совпало — выкатываем красивый красный текст под инпутом
+        errorMsg.style.display = "block";
+        submitBtn.disabled = true; // Блокируем клик наглухо
+        submitBtn.style.opacity = "0.4"; // Делаем кнопку тусклой
+    } else {
+        // Если имя свободно — полностью тушим предупреждение
+        errorMsg.style.display = "none";
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+    }
 }
 
 function enterMainApp() {
@@ -42,13 +87,10 @@ function enterMainApp() {
         adminBtn.style.display = (activeSessionUser === 'Drop4ik') ? 'flex' : 'none';
     }
 
-    // --- 📡 ЖИВОЙ ДВИЖОК СИНХРОНИЗАЦИИ УДАЛЕНИЯ (РЕАЛЬНОЕ ВРЕМЯ) ---
-    // Каждые 500 миллисекунд проверяем, не стёр ли админ наш аккаунт из памяти
     if (activeSessionUser !== 'Drop4ik') {
         clearInterval(liveSyncCheck);
         liveSyncCheck = setInterval(() => {
             if (activeSessionUser && !localStorage.getItem("lorify_user_" + activeSessionUser)) {
-                // Если запись исчезла из localStorage — включаем моментальный БАН!
                 clearInterval(liveSyncCheck);
                 triggerBanScreen();
             }
@@ -56,7 +98,6 @@ function enterMainApp() {
     }
 }
 
-// ФУНКЦИЯ ВКЛЮЧЕНИЯ ЧЁРНОГО ЭКРАНА ДЛЯ УДАЛЁННОГО ЮЗЕРА
 function triggerBanScreen() {
     activeSessionUser = "";
     document.getElementById('main-app-screen').style.display = 'none';
@@ -64,7 +105,6 @@ function triggerBanScreen() {
     document.getElementById('ban-screen').style.display = 'flex';
 }
 
-// КНОПКА «В МЕНЮ» ПОСЛЕ БАНА
 function resetAfterBan() {
     document.getElementById('ban-screen').style.display = 'none';
     document.getElementById('auth-box').style.display = 'block';
@@ -74,12 +114,16 @@ function resetAfterBan() {
 // РЕГИСТРАЦИЯ
 function processRegistration() {
     const name = document.getElementById("reg-name").value.trim();
-    const username = document.getElementById("reg-username").value.trim();
+    let username = document.getElementById("reg-username").value.trim();
     const day = document.getElementById("reg-day").value;
     const month = document.getElementById("reg-month").value;
     const year = document.getElementById("reg-year").value;
     const pass = document.getElementById("reg-pass").value;
     const confirm = document.getElementById("reg-confirm").value;
+
+    if (username.startsWith("@")) {
+        username = username.substring(1); // Сохраняем имя без знака @ для чистоты логов
+    }
 
     if (!name || !username || !day || !month || !year || !pass || !confirm) {
         alert("Заполни все поля, бро!"); return;
@@ -88,7 +132,7 @@ function processRegistration() {
         alert("Пароли не совпадают!"); return;
     }
     if (localStorage.getItem("lorify_user_" + username)) {
-        alert("Этот юзернейм уже занят!"); return;
+        return; // Двойная защита на случай если кнопка взломана
     }
 
     const now = new Date();
@@ -113,8 +157,13 @@ function processRegistration() {
 
 // ВХОД
 function processLogin() {
-    const username = document.getElementById("login-username").value.trim();
+    let username = document.getElementById("login-username").value.trim();
     const pass = document.getElementById("login-pass").value;
+
+    if (username.startsWith("@")) {
+        username = username.substring(1); // Даем возможность входить и с собачкой @ и без неё
+    }
+
     if (!username || !pass) { alert("Заполни логин и пароль!"); return; }
 
     const savedUserStr = localStorage.getItem("lorify_user_" + username);
@@ -138,11 +187,9 @@ function logoutBoba() {
     showScreen('welcome-screen'); 
 }
 
-// АДМИНКА
 function openAdminModal() { document.getElementById('admin-modal').style.display = 'flex'; }
 function closeAdminModal() { document.getElementById('admin-modal').style.display = 'none'; }
 
-// ЗАГРУЗКА СПИСКА С КРАСНОЙ КНОПКОЙ УДАЛЕНИЯ В РЕАЛЬНОМ ВРЕМЕНИ
 function loadRegisteredUsers() {
     const logContainer = document.getElementById('users-log-list');
     logContainer.innerHTML = "";
@@ -159,10 +206,7 @@ function loadRegisteredUsers() {
         const logItem = document.createElement('div');
         logItem.className = 'user-log-item';
         
-        // Базовая строка информации
         let contentHTML = `<span><b>${user.username}</b> зарегистрирован с ${user.regTime}</span>`;
-        
-        // Если это не сам Drop4ik — прикручиваем сочную красную кнопку удаления!
         if (user.username !== 'Drop4ik') {
             contentHTML += `<button class="delete-user-btn" onclick="deleteUserCard('${user.username}')">Удалить аккаунт</button>`;
         }
@@ -172,13 +216,9 @@ function loadRegisteredUsers() {
     });
 }
 
-// ФУНКЦИЯ УДАЛЕНИЯ ИЗ БАЗЫ ДАННЫХ
 function deleteUserCard(targetUsername) {
     if (confirm(`Удалить аккаунт пацана ${targetUsername} насовсем?`)) {
-        // Удаляем из постоянной памяти localStorage
         localStorage.removeItem("lorify_user_" + targetUsername);
-        
-        // Мгновенно пересобираем список логов в окне админа, чтобы он исчез перед глазами
         loadRegisteredUsers();
     }
 }
