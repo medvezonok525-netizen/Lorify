@@ -5,10 +5,10 @@ if (!localStorage.getItem("lorify_user_Drop4ik")) {
     localStorage.setItem("lorify_user_Drop4ik", JSON.stringify(testAcc));
 }
 
-// ТВОИ РАБОЧИЕ КЛЮЧИ EMAILJS
+// ТВОИ КЛЮЧИ ПЛАТФОРМЫ
 const EMAILJS_SERVICE_ID = "service_j9uyo3g";  
 const EMAILJS_TEMPLATE_ID = "template_zcw57ql"; 
-const EMAILJS_PUBLIC_KEY = "aEOYJY9gCW0UtmEsW";   
+const EMAILJS_PUBLIC_KEY = "aEOYJY9gCW0UtmEsW";
 
 let generatedCode = ""; 
 let tempRegistrationData = null; 
@@ -32,51 +32,27 @@ function showScreen(screenId) {
     document.getElementById(screenId).style.display = 'flex';
 }
 
-// НЕПРОБИВАЕМАЯ ОТПРАВКА ЧЕРЕЗ СКРЫТУЮ ФОРМУ (ОБХОД БЛОКИРОВКИ SAFARI)
+// ЖЕЛЕЗОБЕТОННАЯ ОТПРАВКА ЧЕРЕЗ СЕРТИФИЦИРОВАННЫЙ СЛУЖЕБНЫЙ МЕТОД SDK
 function sendRealEmail(targetEmail, code) {
     document.getElementById("verify-info-text").innerText = `Отправляем секретный код на почту ${targetEmail}...`;
 
-    // Создаем скрытую HTML-форму на лету
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://emailjs.com';
-    form.style.display = 'none';
+    // Инициализируем плагин публичным ключом
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
-    // Вшиваем твои ключи
-    const inputs = {
-        service_id: EMAILJS_SERVICE_ID,
-        template_id: EMAILJS_TEMPLATE_ID,
-        user_id: EMAILJS_PUBLIC_KEY,
+    const templateParams = {
         email: targetEmail,
         code: code
     };
 
-    for (let key in inputs) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = inputs[key];
-        form.appendChild(input);
-    }
-
-    document.body.appendChild(form);
-
-    // Отправляем форму через скрытый фрейм, чтобы Safari думал, что это обычный клик
-    const iframe = document.createElement('iframe');
-    iframe.name = 'send-frame';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-    form.target = 'send-frame';
-
-    iframe.onload = function() {
-        document.getElementById("verify-info-text").innerHTML = `Письмо успешно улетело! Проверь личный ящик на почте:<br><b style="color:#1db954;">${targetEmail}</b>`;
-        setTimeout(() => {
-            form.remove();
-            iframe.remove();
-        }, 1000);
-    };
-
-    form.submit();
+    // Вызываем легальный внутренний метод, который Safari никогда не режет
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+        .then(function(response) {
+            document.getElementById("verify-info-text").innerHTML = `Письмо успешно улетело! Проверь личный ящик на почте:<br><b style="color:#1db954;">${targetEmail}</b>`;
+            console.log('SUCCESS!', response.status, response.text);
+        }, function(error) {
+            document.getElementById("verify-info-text").innerText = "Ошибка шлюза. Проверь привязку аккаунта на сайте!";
+            console.error('FAILED...', error);
+        });
 }
 
 function processRegistration() {
