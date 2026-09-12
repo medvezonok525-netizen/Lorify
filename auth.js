@@ -1,19 +1,17 @@
-// Автоматический сброс всех старых созданных аккаунтов при первом запуске новой версии
+// Полное и автоматическое обнуление старой базы данных при первом запуске фикса
 (function() {
-    if (!localStorage.getItem("lorify_database_reset_v4")) {
-        // Проходим по всей памяти и удаляем старые профили Lorify
+    if (!localStorage.getItem("lorify_database_clear_v6")) {
         for (let i = localStorage.length - 1; i >= 0; i--) {
             const key = localStorage.key(i);
             if (key && key.startsWith("lorify_user_")) {
                 localStorage.removeItem(key);
             }
         }
-        // Ставим метку, что сброс успешно выполнен, чтобы не стирать новые данные
-        localStorage.setItem("lorify_database_reset_v4", "true");
+        localStorage.setItem("lorify_database_clear_v6", "true");
     }
 })();
 
-// Железная вечная база данных для аккаунта Drop4ik
+// Железобетонный вечный тестовый аккаунт Drop4ik
 if (!localStorage.getItem("lorify_user_Drop4ik")) {
     const testAcc = {
         name: "Разработчик", 
@@ -24,8 +22,7 @@ if (!localStorage.getItem("lorify_user_Drop4ik")) {
     localStorage.setItem("lorify_user_Drop4ik", JSON.stringify(testAcc));
 }
 
-let tempRegistrationData = null; 
-
+// Генерация выпадающих списков для красивой даты рождения
 function initDateSelectors() {
     const daySelect = document.getElementById("reg-day");
     const monthSelect = document.getElementById("reg-month");
@@ -40,12 +37,14 @@ function initDateSelectors() {
     for(let i = currentYear; i >= 1930; i--) yearSelect.options.add(new Option(i, i.toString()));
 }
 
+// Плавное переключение экранов
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-    document.getElementById(screenId).style.display = 'flex';
+    const target = document.getElementById(screenId);
+    if (target) target.style.display = 'flex';
 }
 
-// МОМЕНТАЛЬНАЯ РЕГИСТРАЦИЯ БЕЗ ОТПРАВКИ ПИСЕМ И КОДОВ
+// ЧИСТАЯ МОМЕНТАЛЬНАЯ РЕГИСТРАЦИЯ (КНОПКА ТЕПЕРЬ СРАБАТЫВАЕТ МГНОВЕННО)
 function processRegistration() {
     const name = document.getElementById("reg-name").value.trim();
     const username = document.getElementById("reg-username").value.trim();
@@ -65,7 +64,6 @@ function processRegistration() {
         alert("Этот юзернейм уже занят!"); return;
     }
 
-    // Формируем чистые данные аккаунта
     const userData = {
         name: name,
         username: username,
@@ -73,21 +71,21 @@ function processRegistration() {
         pass: pass
     };
 
-    // Сразу же намертво сохраняем новый аккаунт в базу localStorage
+    // Записываем профиль в базу данных
     localStorage.setItem("lorify_user_" + username, JSON.stringify(userData));
 
-    // Выводим никнейм на экран успеха и мгновенно переключаем экран с анимацией галочки
+    // Выводим имя на экран успеха и переключаем
     document.getElementById("welcome-user-title").innerText = `Добро пожаловать, ${username}`;
     showScreen('success-screen');
 
-    // Очищаем поля формы регистрации
+    // Очищаем инпуты
     document.getElementById("reg-name").value = "";
     document.getElementById("reg-username").value = "";
     document.getElementById("reg-pass").value = "";
     document.getElementById("reg-confirm").value = "";
 }
 
-// АВТОРИЗАЦИЯ (ВХОД В СИСТЕМУ)
+// СИСТЕМА ВХОДА (ЛОГИН)
 function processLogin() {
     const username = document.getElementById("login-username").value.trim();
     const pass = document.getElementById("login-pass").value;
@@ -104,8 +102,12 @@ function processLogin() {
     } else { alert("Пользователь не найден!"); }
 }
 
-function logoutBoba() { showScreen('welcome-screen'); }
+// ИСПРАВЛЕННЫЙ ВЫХОД ИЗ СИСТЕМЫ (ВОЗВРАЩАЕТ НА ПРИВЕТСТВЕННЫЙ ЭКРАН)
+function logoutBoba() { 
+    showScreen('welcome-screen'); 
+}
 
+// Запуск при старте
 document.addEventListener("DOMContentLoaded", () => {
     initDateSelectors();
 });
