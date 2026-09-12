@@ -20,6 +20,11 @@ function initDateSelectors() {
     
     if (!daySelect || !monthSelect || !yearSelect) return;
 
+    // Очищаем старые опции, чтобы не дублировались
+    daySelect.innerHTML = '<option value="">День</option>';
+    monthSelect.innerHTML = '<option value="">Месяц</option>';
+    yearSelect.innerHTML = '<option value="">Год</option>';
+
     for(let i = 1; i <= 31; i++) daySelect.options.add(new Option(i, i.toString().padStart(2, '0')));
     const months = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
     months.forEach((m, idx) => monthSelect.options.add(new Option(m, (idx + 1).toString().padStart(2, '0'))));
@@ -41,7 +46,7 @@ function showScreen(screenId) {
     }
 }
 
-// ЖИВАЯ ПРОВЕРКА ЮЗЕРНЕЙМА НА ЗАНЯТОСТЬ ПРИ НАБОРЕ (ИСПРАВЛЕННАЯ, БЕЗ ЛАГОВ И ЗАЛИПАНИЙ)
+// ЖИВАЯ ПРОВЕРКА ЮЗЕРНЕЙМА
 function checkUsernameLive() {
     const usernameInput = document.getElementById("reg-username");
     const errorMsg = document.getElementById("username-error-msg");
@@ -61,7 +66,6 @@ function checkUsernameLive() {
         return;
     }
 
-    // Попиксельный перебор ключей базы данных
     let isTaken = false;
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -73,7 +77,7 @@ function checkUsernameLive() {
 
     if (isTaken) {
         errorMsg.style.display = "block";
-        submitBtn.disabled = true; // Замораживаем кнопку только при совпадении
+        submitBtn.disabled = true;
         submitBtn.style.opacity = "0.4";
     } else {
         errorMsg.style.display = "none";
@@ -82,14 +86,12 @@ function checkUsernameLive() {
     }
 }
 
-// ПЕРЕКЛЮЧЕНИЕ КАРТОЧЕК ВНУТРИ САЙДБАРА ПЛЕЕРА
 function changeContentArea(blockName) {
     document.querySelectorAll('.content-block').forEach(b => b.style.display = 'none');
     const targetBlock = document.getElementById('content-' + blockName);
     if (targetBlock) targetBlock.style.display = 'block';
 }
 
-// ВХОД В ПРИЛОЖЕНИЕ С ЗАПУСКОМ ЖИВОЙ СИНХРОНИЗАЦИИ
 function enterMainApp() {
     document.getElementById('auth-box').style.display = 'none';
     document.getElementById('main-app-screen').style.display = 'flex';
@@ -112,7 +114,7 @@ function enterMainApp() {
 }
 
 function triggerBanScreen() {
-    localStorage.removeItem("lorify_active_session"); // Стираем сессию при бане
+    localStorage.removeItem("lorify_active_session");
     activeSessionUser = "";
     document.getElementById('main-app-screen').style.display = 'none';
     document.getElementById('auth-box').style.display = 'none';
@@ -154,7 +156,7 @@ function processRegistration() {
     };
 
     localStorage.setItem("lorify_user_" + username, JSON.stringify(userData));
-    localStorage.setItem("lorify_active_session", username); // СОХРАНЯЕМ ВЕЧНУЮ СЕССИЮ
+    localStorage.setItem("lorify_active_session", username);
     activeSessionUser = username;
 
     document.getElementById("welcome-user-title").innerText = `Добро пожаловать, ${username}`;
@@ -183,7 +185,7 @@ function processLogin() {
             document.getElementById("login-username").value = "";
             document.getElementById("login-pass").value = "";
             
-            localStorage.setItem("lorify_active_session", username); // СОХРАНЯЕМ ВЕЧНУЮ СЕССИЮ
+            localStorage.setItem("lorify_active_session", username);
             activeSessionUser = username;
             enterMainApp();
         } else { alert("Неверный пароль!"); }
@@ -193,7 +195,7 @@ function processLogin() {
 // ВЫХОД
 function logoutBoba() { 
     clearInterval(liveSyncCheck);
-    localStorage.removeItem("lorify_active_session"); // СТИРАЕМ СЕССИЮ ПРИ ЛОГАУТЕ
+    localStorage.removeItem("lorify_active_session");
     activeSessionUser = "";
     document.getElementById('main-app-screen').style.display = 'none';
     document.getElementById('auth-box').style.display = 'block';
@@ -236,20 +238,22 @@ function deleteUserCard(targetUsername) {
     }
 }
 
-// 🧠 ДВИЖОК АВТОМАТИЧЕСКОГО ОПРЕДЕЛЕНИЯ ТЕКУЩЕЙ СЕССИИ ПРИ ЗАПУСКЕ САЙТА
+// БЕЗОПАСНЫЙ СИНХРОНИЗАТОР СЕССИИ (ИСПРАВЛЕННЫЙ, БЕЗ СБОЕВ ПРИ ПЕРВОМ ЗАПУСКЕ)
 function checkSavedSessionLive() {
     const savedSession = localStorage.getItem("lorify_active_session");
     if (savedSession) {
-        // Проверяем, существует ли этот юзер до сих пор в базе данных
-        if (localStorage.getItem("lorify_user_" + savedSession)) {
+        const checkUserExists = localStorage.getItem("lorify_user_" + savedSession);
+        if (checkUserExists) {
             activeSessionUser = savedSession;
-            enterMainApp(); // Мгновенно пробиваем старт плеера Lorify
+            enterMainApp();
         } else {
             localStorage.removeItem("lorify_active_session");
         }
     }
 }
 
+// Строгий порядок запуска
 document.addEventListener("DOMContentLoaded", () => {
     initDateSelectors();
-    checkSavedSessionLive(); // Запускаем проверку сохраненного аккаунта
+    checkSavedSessionLive();
+});
