@@ -1,16 +1,29 @@
+// Автоматический сброс всех старых созданных аккаунтов при первом запуске новой версии
+(function() {
+    if (!localStorage.getItem("lorify_database_reset_v4")) {
+        // Проходим по всей памяти и удаляем старые профили Lorify
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith("lorify_user_")) {
+                localStorage.removeItem(key);
+            }
+        }
+        // Ставим метку, что сброс успешно выполнен, чтобы не стирать новые данные
+        localStorage.setItem("lorify_database_reset_v4", "true");
+    }
+})();
+
+// Железная вечная база данных для аккаунта Drop4ik
 if (!localStorage.getItem("lorify_user_Drop4ik")) {
     const testAcc = {
-        email: "drop@lorify.music", name: "Разработчик", username: "Drop4ik", birthday: "01.01.2000", pass: "123"
+        name: "Разработчик", 
+        username: "Drop4ik", 
+        birthday: "01.01.2000", 
+        pass: "123"
     };
     localStorage.setItem("lorify_user_Drop4ik", JSON.stringify(testAcc));
 }
 
-// ТВОИ ЛИЧНЫЕ РАБОЧИЕ КЛЮЧИ EMAILJS
-const EMAILJS_SERVICE_ID = "service_j9uyo3g";  
-const EMAILJS_TEMPLATE_ID = "template_zcw57ql"; 
-const EMAILJS_PUBLIC_KEY = "aEOYJY9gCW0UtmEsW";   
-
-let generatedCode = ""; 
 let tempRegistrationData = null; 
 
 function initDateSelectors() {
@@ -32,61 +45,8 @@ function showScreen(screenId) {
     document.getElementById(screenId).style.display = 'flex';
 }
 
-// ЖЕЛЕЗОБЕТОННАЯ ОТПРАВКА ЧЕРЕЗ НЕВИДИМУЮ НАСТОЯЩУЮ HTML-ФОРМУ
-async function sendRealEmail(targetEmail, code) {
-    document.getElementById("verify-info-text").innerText = `Отправляем секретный код на почту ${targetEmail}...`;
-
-    // 1. Создаем реальную HTML-форму в памяти устройства
-    const hiddenForm = document.createElement('form');
-    hiddenForm.style.display = 'none';
-
-    // 2. Наполняем форму скрытыми инпутами, имена которых жестко привязаны к API EmailJS
-    const fields = {
-        "service_id": EMAILJS_SERVICE_ID,
-        "template_id": EMAILJS_TEMPLATE_ID,
-        "user_id": EMAILJS_PUBLIC_KEY,
-        "email": targetEmail, // Твой тег {{email}} из шаблона
-        "code": code          // Твой тег {{code}} из шаблона
-    };
-
-    for (let key in fields) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = fields[key];
-        hiddenForm.appendChild(input);
-    }
-
-    // Добавляем форму на страницу, чтобы браузер зафиксировал её наличие
-    document.body.appendChild(hiddenForm);
-
-    // 3. Упаковываем форму в стандартный системный объект FormData
-    const realFormData = new FormData(hiddenForm);
-
-    try {
-        // Делаем официальный запрос, отправляя НАСТОЯЩУЮ форму
-        const response = await fetch("https://emailjs.com", {
-            method: "POST",
-            body: realFormData
-        });
-
-        if (response.ok) {
-            document.getElementById("verify-info-text").innerHTML = `Письмо успешно улетело! Проверь личный ящик на почте:<br><b style="color:#1db954;">${targetEmail}</b>`;
-        } else {
-            const errText = await response.text();
-            document.getElementById("verify-info-text").innerText = "Ошибка шлюза EmailJS: " + errText;
-        }
-    } catch (e) {
-        document.getElementById("verify-info-text").innerText = "Браузер заблокировал сетевое соединение. Повтори запрос!";
-        console.error(e);
-    } finally {
-        // Полностью удаляем временную форму, чтобы не засорять страницу
-        hiddenForm.remove();
-    }
-}
-
+// МОМЕНТАЛЬНАЯ РЕГИСТРАЦИЯ БЕЗ ОТПРАВКИ ПИСЕМ И КОДОВ
 function processRegistration() {
-    const email = document.getElementById("reg-email").value.trim();
     const name = document.getElementById("reg-name").value.trim();
     const username = document.getElementById("reg-username").value.trim();
     const day = document.getElementById("reg-day").value;
@@ -95,7 +55,7 @@ function processRegistration() {
     const pass = document.getElementById("reg-pass").value;
     const confirm = document.getElementById("reg-confirm").value;
 
-    if (!email || !name || !username || !day || !month || !year || !pass || !confirm) {
+    if (!name || !username || !day || !month || !year || !pass || !confirm) {
         alert("Заполни все поля, бро!"); return;
     }
     if (pass !== confirm) {
@@ -105,30 +65,29 @@ function processRegistration() {
         alert("Этот юзернейм уже занят!"); return;
     }
 
-    tempRegistrationData = {
-        email: email, name: name, username: username, birthday: `${day}.${month}.${year}`, pass: pass
+    // Формируем чистые данные аккаунта
+    const userData = {
+        name: name,
+        username: username,
+        birthday: `${day}.${month}.${year}`,
+        pass: pass
     };
 
-    const part1 = Math.floor(100 + Math.random() * 900);
-    const part2 = Math.floor(100 + Math.random() * 900);
-    generatedCode = `${part1}-${part2}`;
+    // Сразу же намертво сохраняем новый аккаунт в базу localStorage
+    localStorage.setItem("lorify_user_" + username, JSON.stringify(userData));
 
-    showScreen('verify-screen');
-    sendRealEmail(email, generatedCode);
+    // Выводим никнейм на экран успеха и мгновенно переключаем экран с анимацией галочки
+    document.getElementById("welcome-user-title").innerText = `Добро пожаловать, ${username}`;
+    showScreen('success-screen');
+
+    // Очищаем поля формы регистрации
+    document.getElementById("reg-name").value = "";
+    document.getElementById("reg-username").value = "";
+    document.getElementById("reg-pass").value = "";
+    document.getElementById("reg-confirm").value = "";
 }
 
-function checkVerificationCode() {
-    const inputCode = document.getElementById("verify-code").value.trim();
-    if (inputCode === generatedCode) {
-        localStorage.setItem("lorify_user_" + tempRegistrationData.username, JSON.stringify(tempRegistrationData));
-        document.getElementById("welcome-user-title").innerText = `Добро пожаловать, ${tempRegistrationData.username}`;
-        showScreen('success-screen');
-        document.getElementById("verify-code").value = "";
-    } else {
-        alert("Неверный код! Посмотри внимательнее новое письмо в своём почтовом ящике.");
-    }
-}
-
+// АВТОРИЗАЦИЯ (ВХОД В СИСТЕМУ)
 function processLogin() {
     const username = document.getElementById("login-username").value.trim();
     const pass = document.getElementById("login-pass").value;
