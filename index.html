@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lorify Music</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- 1. СТАРТОВЫЙ ПРИВЕТСТВЕННЫЙ ЭКРАН -->
+        <div id="welcome-screen" class="screen">
+            <div class="logo-title">Lorify</div>
+            <div class="welcome-buttons">
+                <button class="btn btn-primary" onclick="showScreen('register-screen')">Регистрация</button>
+                <button class="btn btn-secondary" onclick="showScreen('login-screen')">Войти</button>
+            </div>
+        </div>
+
+        <!-- 2. ЭКРАН РЕГИСТРАЦИИ -->
+        <div id="register-screen" class="screen">
+            <div class="form-card">
+                <h2>Создать аккаунт</h2>
+                <div class="input-group">
+                    <label>Электронная почта</label>
+                    <input type="email" id="reg-email" placeholder="твоя_почта@mail.ru">
+                </div>
+                <div class="input-group">
+                    <label>Имя</label>
+                    <input type="text" id="reg-name" placeholder="Иван">
+                </div>
+                <div class="input-group">
+                    <label>Юзернейм</label>
+                    <input type="text" id="reg-username" placeholder="username">
+                </div>
+                <div class="input-group">
+                    <label>Дата рождения</label>
+                    <div class="date-row">
+                        <select id="reg-day"><option value="">День</option></select>
+                        <select id="reg-month"><option value="">Месяц</option></select>
+                        <select id="reg-year"><option value="">Год</option></select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Пароль</label>
+                    <input type="password" id="reg-pass" placeholder="••••••••">
+                </div>
+                <div class="input-group">
+                    <label>Повтор пароля</label>
+                    <input type="password" id="reg-confirm" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary" id="reg-submit-btn" onclick="processRegistration()">Продолжить</button>
+            </div>
+            <div class="back-link" onclick="showScreen('welcome-screen')">Назад</div>
+        </div>
+
+        <!-- 3. ЭКРАН ВВОДА КОДА ИЗ ПИСЬМА -->
+        <div id="verify-screen" class="screen">
+            <div class="form-card">
+                <h2>Подтверждение почты</h2>
+                <p style="font-size: 14px; color: var(--text-muted); text-align: center; margin-bottom: 20px; line-height: 1.4;" id="verify-info-text">
+                    Отправляем секретный код верификации...
+                </p>
+                <div class="input-group">
+                    <label>Шестизначный код (000-000)</label>
+                    <input type="text" id="verify-code" placeholder="Введи код из письма" style="text-align: center; font-size: 20px; letter-spacing: 2px;">
+                </div>
+                <button class="btn btn-primary" onclick="checkVerificationCode()">Подтвердить</button>
+            </div>
+            <div class="back-link" onclick="showScreen('register-screen')">Назад</div>
+        </div>
+
+        <!-- 4. ЭКРАН УСПЕХА С ГАЛОЧКОЙ -->
+        <div id="success-screen" class="screen">
+            <div class="success-icon-box">
+                <span class="checkmark">✓</span>
+            </div>
+            <div class="welcome-user-text" id="welcome-user-title">Добро пожаловать, user</div>
+            <button class="btn btn-primary" style="max-width: 200px;" onclick="showScreen('soon-screen')">Начать</button>
+        </div>
+
+        <!-- 5. ЭКРАН ЛОГИНА -->
+        <div id="login-screen" class="screen">
+            <div class="form-card">
+                <h2>Войти в Lorify</h2>
+                <div class="input-group">
+                    <label>Юзернейм</label>
+                    <input type="text" id="login-username" placeholder="Drop4ik">
+                </div>
+                <div class="input-group">
+                    <label>Пароль</label>
+                    <input type="password" id="login-pass" placeholder="123">
+                </div>
+                <button class="btn btn-primary" onclick="processLogin()">Войти</button>
+            </div>
+            <div class="back-link" onclick="showScreen('welcome-screen')">Назад</div>
+        </div>
+
+        <!-- 6. ЭКРАН СКОРО -->
+        <div id="soon-screen" class="screen">
+            <div class="soon-text">soon</div>
+            <div class="back-link" style="margin-top: 40px;" onclick="logoutBoba()">Выйти из аккаунта</div>
+        </div>
+
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>
