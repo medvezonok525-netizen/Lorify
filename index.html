@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lorify Music</title>
-    <!-- Хак против кэша Safari (?v=2.0) заставит iPad принудительно обновить дизайн -->
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <!-- Обновляем версию до v3.0, чтобы пробить кэш Safari на iPad -->
+    <link rel="stylesheet" href="style.css?v=3.0">
 </head>
 <body>
 
@@ -139,21 +139,24 @@
                     </div>
                 </div>
 
-                <!-- 🎧 КАРТОЧКА АЛЬБОМА ДИНАСТИЯ (ИСПРАВЛЕННАЯ СТРУКТУРА ТЕГОВ) -->
+                <!-- 🎧 ВЕРТИКАЛЬНАЯ СЕТКА КАРТОЧЕК В РАЗДЕЛЕ «ВСЕ МУЗЫКИ» -->
                 <div id="content-music" class="content-block" style="display: none; width: 100%;">
-                    <div class="music-page-wrapper">
+                    <div class="music-grid-container">
                         
-                        <div class="album-card">
-                            <!-- 1. КАРТИНКА СТРОГО НА ПЕРВОМ МЕСТЕ (СЛЕВА) -->
-                            <img class="album-cover" src="./IMG_3167.png" alt="Династия">
+                        <!-- ПЕРВАЯ ВЕРТИКАЛЬНАЯ КАРТОЧКА АЛЬБОМА -->
+                        <div class="album-card-vertical">
+                            <!-- Картинка теперь строго сверху -->
+                            <img class="album-cover-vertical" src="./IMG_3167.png" alt="Династия">
                             
-                            <!-- 2. БЛОК С ТЕКСТОМ НА ВТОРОМ МЕСТЕ (СПРАВА) -->
-                            <div class="album-details">
-                                <div class="album-title">ДИНАСТИЯ</div>
-                                <div class="album-author">VILLIAN & madk1d</div>
-                                <div class="album-soon">скоро будет здесь</div>
+                            <!-- Описание строго снизу под ней -->
+                            <div class="album-details-vertical">
+                                <div class="album-title-vertical">ДИНАСТИЯ</div>
+                                <div class="album-author-vertical">VILLIAN & madk1d</div>
+                                <div class="album-soon-vertical">скоро будет здесь</div>
                             </div>
                         </div>
+
+                        <!-- Сюда в последовательность ты сможешь добавлять новые карточки, они встанут рядом! -->
 
                     </div>
                 </div>
